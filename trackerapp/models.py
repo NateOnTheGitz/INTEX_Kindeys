@@ -61,9 +61,9 @@ class Recommended_Levels(models.Model):
     rec_potassium_mg_max = models.IntegerField(default=0)
     rec_phos_mg_min = models.IntegerField(default=0)
     rec_phos_mg_max = models.IntegerField(default=0)
-    rec_water_L_male = models.DecimalField(default=0)
-    rec_water_L_female = models.DecimalField(default=0)
-    rec_water_L_by_kg = models.DecimalField(default=0)
+    rec_water_L_male = models.DecimalField(default=0, decimal_places=3, max_digits=10)
+    rec_water_L_female = models.DecimalField(default=0, decimal_places=3, max_digits=10)
+    rec_water_L_by_kg = models.DecimalField(default=0, decimal_places=3, max_digits=10)
     
     def __str__(self):
         return (self.stage)
@@ -76,6 +76,7 @@ class Recommended_Levels(models.Model):
 
 class Food_Log(models.Model):
     date = models.DateTimeField(default=timezone.now)
+    username = models.ForeignKey(User, on_delete=models.DO_NOTHING, default=0)
     meal_type = models.CharField(max_length=50)
     food_name = models.ForeignKey(Food_Ingredient, on_delete=models.DO_NOTHING)
     quantity = models.DecimalField(default=0, decimal_places=3, max_digits=10)
