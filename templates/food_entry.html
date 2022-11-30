@@ -5,14 +5,38 @@
 {% block title %} Food Entry {% endblock %}
  
 {% block content %}
-<h1>This is where you'll enter food</h1>
+<br>
+<h1>Food Journal</h1>
 <div class = "border p-3 shadow">
-    <h4>Add Data</h4>
+    <h4>Add An Entry</h4>
     <hr>
     <form method="POST">
         {% csrf_token %}
-        {{ form }}
-        <input class = 'btn btn-success btn-block' type='submit' value = 'Add'>
+        {{ form|crispy }}
+        <input class = 'btn btn-success btn-block' type='submit' value = 'Log Food'>
+    </xform>
+</div>
+<br>
+<div class = "border p-3 shadow">
+    <h4>Don't see your food? Add it here!</h4>
+    <hr>
+    <form method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="exampleFormControlSelect1">Enter Food Name:</label>
+            <input class="form-control" type="text">
+            <br>
+            <label for="exampleFormControlSelect1">Select Measurement Type:</label>
+            {% comment %} <select name="" id=""></select> {% endcomment %}
+            <p>something cool will go here</p>
+            <label for="exampleFormControlSelect1">Sodium (mg):</label>
+            <input class="form-control" type="number">
+            <label for="exampleFormControlSelect1">Sodium:</label>
+            <input class="form-control" type="number">
+        </div>
     </form>
 </div>
+
+<br><br>
+
 {% endblock %}

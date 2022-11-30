@@ -63,10 +63,10 @@ class Recommended_Levels(models.Model):
     rec_phos_mg_max = models.IntegerField(default=0)
     rec_water_L_male = models.DecimalField(default=0, decimal_places=3, max_digits=10)
     rec_water_L_female = models.DecimalField(default=0, decimal_places=3, max_digits=10)
-    rec_water_L_by_kg = models.DecimalField(default=0, decimal_places=3, max_digits=10)
+    rec_protein_g_by_kg = models.DecimalField(default=0, decimal_places=3, max_digits=10)
     
     def __str__(self):
-        return (self.stage)
+        return str((self.stage))
         
     class Meta:
         verbose_name_plural = 'Recommended Levels'
@@ -75,7 +75,7 @@ class Recommended_Levels(models.Model):
 
 
 class Food_Log(models.Model):
-    date = models.DateTimeField(default=timezone.now)
+    date = models.DateField(default=timezone.now)
     username = models.ForeignKey(User, on_delete=models.DO_NOTHING, default=0)
     meal_type = models.CharField(max_length=50)
     food_name = models.ForeignKey(Food_Ingredient, on_delete=models.DO_NOTHING)
@@ -86,7 +86,11 @@ class Food_Log(models.Model):
         verbose_name_plural = 'Food Log'
         db_table = 'food_log'
 
+    @property
+    def date_user_food(self):
+        return '%s %s %s' % (str(self.date), self.username, self.food_name)    
+
     def __str__(self):
-        return (self.date)
+        return str((self.date_user_food))
 
     
