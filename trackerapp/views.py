@@ -1,10 +1,7 @@
 from django.shortcuts import render, redirect
-from .forms import Food_Log_Form
-from .forms import Add_Food
-from .forms import Create_User
-from .models import Food_Log, Recommended_Levels, Food_Ingredient, Measurement, User, Food_Ingredient
-from datetime import datetime
-from datetime import timedelta
+from .forms import Food_Log_Form, Add_Food, Create_User
+from .models import Food_Log, Recommended_Levels, Food_Ingredient, User, Food_Ingredient, Measurement
+from datetime import datetime, timedelta
 
 # Create your views here.
 def indexPageView(request):
@@ -73,10 +70,88 @@ def addfoodEntryPageView(request) :
     return render(request, 'add_food.html', context) 
 
 def reportsPageView(request) :
-    users = User.objects.all()
-    recMicroNutrients = Recommended_Levels.objects.values() # excludes "stage" field
+    curr_username = "TheRealMG"
+    nutrientType = "protien"
+    timeRange = 7
+    curr_date = datetime.today().date()
+    if request.method == 'POST':
+        nutrientType = request.POST["nutrientSelect"]
+        curr_date = datetime.strptime(request.POST["startDate"],'%Y-%m-%d').date()
+        timeRange = int(request.POST["dateRange"])
+    else: 
+        nutrientType = ""
+        timeRange = 7
+        curr_date = datetime.today().date()
+
+    # DATA FOR BAR GRAPH 
+    curr_user_object = User.objects.filter(username=curr_username).values() 
+    curr_date_for_bar = datetime.today().date()
+
+    if len(curr_user_object) > 0:
+        for row in curr_user_object:
+            curr_user = {
+            "first_name": row['first_name'],
+            "last_name": row['last_name'],
+            "gender": row['gender'],
+            "username": row['username'],
+            "password": row['password'],
+            "email": row['email'],
+            "stage": row['stage'],
+            "comorbidity": row['comorbidity'],
+            "date_of_birth": row['date_of_birth'],
+            "weight_lbs": row['weight_lbs'],
+            "height_in": row['height_in'],
+            }
+        userFound = True
+    else: 
+        #SHOULD BE ERROR
+        userFound = False
+        curr_user = 0 
+
+    logs_by_day = Food_Log.objects.filter(date=curr_date_for_bar).filter(username__username=curr_username).values()
+    sodiumByDay = 0
+    potassiumByDay = 0
+    waterByDay = 0
+    phosByDay = 0
+    protienByDay = 0
+    if len(logs_by_day) > 0:
+        for counter in range(0, len(logs_by_day)):
+            sodium = 0
+            potassium = 0
+            water = 0
+            phos = 0
+            protien= 0
+            quantity = logs_by_day[counter]['quantity']
+            food_log_id = logs_by_day[counter]['id']
+            micro_values_for_log = Food_Ingredient.objects.filter(food_log__id=food_log_id).values()
+            sodium = micro_values_for_log[0]["sodium_mg"] * quantity
+            potassium = micro_values_for_log[0]["potassium_mg"] * quantity
+            water = micro_values_for_log[0]["water_L"] * quantity
+            phos = micro_values_for_log[0]["phos_mg"] * quantity
+            protien= micro_values_for_log[0]["protien_g"] * quantity
+            sodiumByDay += sodium
+            potassiumByDay += potassium
+            waterByDay += water
+            phosByDay += phos
+            protienByDay += protien
+
+        actualByDay = {
+        "sodium": sodiumByDay,
+        "potassium": potassiumByDay,
+        "water": waterByDay,
+        "phos": phosByDay,
+        "protien": protienByDay,
+        }
+        logsFound = True
+    else: 
+        #SHOULD BE ERROR
+        actualByDay = 0
+        logsFound = False
+
+     # DATA FOR BAR GRAPH LIMITS    
+    recMicroNutrients = Recommended_Levels.objects.values()
     for row in recMicroNutrients:
-        recByMicro = { #dictionary for min/max on bar graphs for each micro 
+        recByMicro = {
         "sodium_min": row['rec_sodium_mg_min'],
         "sodium_max": row['rec_sodium_mg_max'],
         "potassium_min": row['rec_potassium_mg_min'],
@@ -85,89 +160,84 @@ def reportsPageView(request) :
         "phos_max": row['rec_phos_mg_max'],
         "water_m": row["rec_water_L_male"],
         "water_f": row["rec_water_L_female"],
-        "protien_ratio": row["rec_protein_g_by_kg"],
+        "protien_limit": row["rec_protein_g_by_kg"] * curr_user['weight_lbs'],
         }
 
-    curr_date = datetime.strptime("11-27-2022", '%m-%d-%Y').date()  #needs to be passed in by a parameter to this function 
-    
-    curr_user = "TheRealMG" #needs to be passed in by a parameter to this function 
-    logs_by_day = Food_Log.objects.filter(date=curr_date).filter(username__username=curr_user).values()
-    for counter in range(0, len(logs_by_day)-1):
-        sodiumByDay = 0
-        potassiumByDay = 0
-        waterByDay = 0
-        phosByDay = 0
-        protienByDay = 0
-        quantity = logs_by_day[counter]['quantity']
-        food_log_id = logs_by_day[counter]['id']
-        micro_values_for_log = Food_Ingredient.objects.filter(food_log__id=food_log_id).values()
-        sodium = micro_values_for_log[counter]["sodium_mg"] * quantity
-        potassium = micro_values_for_log[counter]["potassium_mg"] * quantity
-        water = micro_values_for_log[counter]["water_L"] * quantity
-        phos = micro_values_for_log[counter]["phos_mg"] * quantity
-        protien = micro_values_for_log[counter]["protien_g"] * quantity
-        sodiumByDay += sodium
-        potassiumByDay += potassium
-        waterByDay += water
-        phosByDay += phos
-        protienByDay += protien
-    actualByDay = {
-    "sodium": sodiumByDay,
-    "potassium": potassiumByDay,
-    "water": waterByDay,
-    "phos": phosByDay,
-    "protien": protienByDay
-    }
+    #BAR GRAPH CHECK DATA EXCEEDS LIMITS
+    #Water
+    if curr_user["gender"] == "M" or "m" or "Male" or "male":
+        if actualByDay['water'] > 3.7 :
+            waterAlert = True
+    else :
+        if actualByDay['water'] > 2.7 :
+            waterAlert = True
 
+    if actualByDay['sodium'] > recByMicro['sodium_max'] :
+        sodiumAlert = True
+    else :
+        sodiumAlert = False
+
+    if actualByDay['potassium'] > recByMicro['potassium_max'] :
+        potassiumAlert = True
+    else :
+        potassiumAlert = False
+
+    if actualByDay['phos'] > recByMicro['phos_max'] :
+        phosAlert = True
+    else :
+        phosAlert = False
+
+    if actualByDay['protien'] > recByMicro['protien_limit'] :
+        protienAlert = True
+    else :
+        protienAlert = False
+    # DATA FOR LINE GRAPH
     datesWeek = [] # gets the dates for the last week
-    for i in range(0,7):
-        datesWeek.append(curr_date - timedelta(days=i))
+    for i in range(0, timeRange):
+        datesWeek.append(curr_date + timedelta(days=i))
     
-    sliceSodium = []
-    slicePotassium = []
-    sliceWater = []
-    slicePhos = []
-    sliceProtien = []
-    for counter in range(0,7):
-        sodiumConsumed = 0
-        potassiumConsumed = 0
-        waterConsumed = 0
-        phosConsumed = 0
-        protienConsumed = 0
-        curr_date = datesWeek[counter]
-        logs_by_day = Food_Log.objects.filter(date=curr_date).filter(username__username=curr_user).values()
+    sliceNutrient = []
+    for counter in range(0,timeRange):
+        nutrientConsumed = 0
+        increment_date = datesWeek[counter]
+        logs_by_day = Food_Log.objects.filter(date=increment_date).filter(username__username=curr_username).values()
         for log in logs_by_day:
             quantity = log['quantity']
             food_log_id = log['id']
             micro_values_for_log = Food_Ingredient.objects.filter(food_log__id=food_log_id).values()
             # can call index 0 bc this matches on a pk  and will always return just one record but it's wrapped in a slice
-            sodium = micro_values_for_log[0]["sodium_mg"] * quantity 
-            potassium = micro_values_for_log[0]["potassium_mg"] * quantity
-            water = micro_values_for_log[0]["water_L"] * quantity
-            phos = micro_values_for_log[0]["phos_mg"] * quantity
-            protien = micro_values_for_log[0]["protien_g"] * quantity
-            sodiumConsumed += sodium
-            potassiumConsumed += potassium
-            waterConsumed += water
-            phosConsumed += phos
-            protienConsumed += protien
-        sliceSodium.append(sodiumConsumed)
-        slicePotassium.append(potassiumConsumed)
-        sliceWater.append(waterConsumed)
-        slicePhos.append(phosConsumed)
-        sliceProtien.append(protienConsumed)
+            if nutrientType == "sodium": 
+                nutrient = micro_values_for_log[0]["sodium_mg"] * quantity 
+            elif nutrientType ==  "potassium":
+                nutrient = micro_values_for_log[0]["potassium_mg"] * quantity
+            elif nutrientType == "water":
+                nutrient = micro_values_for_log[0]["water_L"] * quantity
+            elif nutrientType == "phos":
+                nutrient = micro_values_for_log[0]["phos_mg"] * quantity
+            else: 
+                nutrient = micro_values_for_log[0]["protien_g"] * quantity
+            nutrientConsumed += nutrient
+        sliceNutrient.append(nutrientConsumed)
 
-    test = sliceSodium
-
-    
+    # CONTEXT DICTIONARY 
     context = {
         "recByMicro": recByMicro,
         "datesWeek": datesWeek,
         "curr_date": curr_date,
-        "test": test,
-        'users': users,
-        'actualByDay': actualByDay
+        "sliceNutrient": sliceNutrient,
+        "nutrientType": nutrientType,
+        'curr_user': curr_user,
+        'actualByDay': actualByDay,
+        'timeRange': timeRange,
+        'logsFound': logsFound,
+        'userFound': userFound,
+        'waterAlert': waterAlert,
+        'sodiumAlert': sodiumAlert,
+        'potassiumAlert' : potassiumAlert,
+        'phosAlert' : phosAlert,
+        'protienAlert' : protienAlert,
 
+        # 'test': test,
     }
     return render(request, 'reports.html', context) 
 
@@ -180,8 +250,39 @@ def editPageView(request) :
     return render(request, 'edit.html', context) 
 
     
-def delete(request) :
-    pass
+def delete(request, id) :
+    log = Food_Log.objects.get(id=id)
+    log.delete()
+    return redirect ('editpage')
 
-def edit(request):
-    pass
+def edit(request, id):
+    mylog = Food_Log.objects.get(id=id)
+    foods = Food_Ingredient.objects.all()
+    measures = Measurement.objects.all()
+    if request.method == 'POST':
+        new_date = request.POST['date']
+        new_meal_type = request.POST['meal_type']
+        new_food_name = request.POST['food_name']
+        new_quantity = request.POST['quantity']
+        new_measurement = request.POST['measurement']
+        mylog.date = new_date
+        mylog.meal_type = new_meal_type
+        mylog.food_name = Food_Ingredient.objects.get(id = id)
+        mylog.quantity = new_quantity
+        mylog.measurement = Measurement.objects.get(id = id)
+        mylog.save()
+    context={
+        'record': mylog,
+        'foods': foods,
+        'measures': measures
+    }
+    return render(request, 'update.html', context)
+
+def selectPageView(request) :
+    users = User.objects.all()
+    if request.method == 'POST':
+        return redirect('reports')  
+    context = {
+        'users': users
+    }
+    return render(request, 'select_landing.html', context) 

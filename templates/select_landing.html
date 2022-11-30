@@ -3,3 +3,16 @@
 {% block title %} Select {% endblock %}
 
 {% block content %}
+<form action="POST">
+    <label for="report_user">Select User:</label>
+    <select class="form-control" id="report_user">
+        {% for user in users %}
+        <option value="{{users.id}}">{{user}}</option>
+        <p>{{user}}</p>
+        {% endfor %}
+    </select>
+    <br>
+    <button type="submit">Get Reports</button>
+</form>
+{% endblock %}
+

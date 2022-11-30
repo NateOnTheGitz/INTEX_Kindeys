@@ -3,52 +3,154 @@
 {% block title %} Reports {% endblock %}
  
 {% block content %}
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+    <symbol id="check-circle-fill" fill="currentColor" viewBox="0 0 16 16">
+      <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+    </symbol>
+    <symbol id="info-fill" fill="currentColor" viewBox="0 0 16 16">
+      <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+    </symbol>
+    <symbol id="exclamation-triangle-fill" fill="currentColor" viewBox="0 0 16 16">
+      <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+    </symbol>
+</svg>
+
 {% comment %} <script src="path/to/chartjs/dist/chart.min.js"></script>
 <script src="path/to/chartjs-plugin-annotation/dist/chartjs-plugin-annotation.min.js"></script> {% endcomment %}
 <br><br><br>
-<h1>View your reports here</h1>
+<h1>View daily totals</h1>
+
 <br>
 <a href="{% url 'editpage' %}">Edit Entries</a>
 <br>
-<select class="form-control" id="report_user">
-    {% for user in users %}
-    <option value="{{users.id}}">{{user}}</option>
-    <p>{{user}}</p>
-    {% endfor %}
-</select>
-<br>
+{% block userselect %}
+
+{% endblock %}
+
 <div>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.0.1/dist/chart.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/2.1.0/chartjs-plugin-annotation.min.js" integrity="sha512-1uGDhRiDlpOPrTi54rJHu3oBLizqaadZDDft+j4fVeFih6eQBeRPJuuP3JcxIqJxIjzOmRq57XwwO4FT+/owIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <canvas id="myChartSodium" width="400" height="50"></canvas>
+    <canvas id="myChartWater" width="400" height="35"></canvas>
+    <script src="path/to/chartjs/dist/chart.min.js"></script>
+    <script src="path/to/chartjs-plugin-annotation/dist/chartjs-plugin-annotation.min.js"></script>
+    <script>
+        var water = 0
+        var person = "{{curr_user.gender}}"
+        if (person === "M" ||"m" || "Male" || "male") {
+            person = "M"
+            water = 3.7
+        } else {
+            person = "F"
+            water = 2.7
+        }
+        
+        var limitWater = 0
+
+        if ({{actualByDay.water}} > water){
+            limitWater = {{actualByDay.water}} + 2
+        } else if (water > {{actualByDay.water}}) {
+            limitWater = water + 2
+        } else
+            limitWater = water + 2
+
+    const ctxWater = document.getElementById('myChartWater').getContext('2d');
+    const myChartWater = new Chart(ctxWater, {
+        type: 'bar',
+        data: {
+            labels: ['Water'],
+            datasets: [{
+                label: 'Amount Of Water (L)',
+                data: [{{actualByDay.water}}],
+                backgroundColor: [
+                    '#6398c9',
+
+                ],
+                borderColor: [
+                    '#145970'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            plugins: {
+                autocolors: false,
+                annotation: {
+                    annotations: {
+                        limitLine1: {
+                            type: 'line',
+                            xMin: water,
+                            xMax: water,
+                            backgroundColor: 'black',
+                            borderWidth: 5,
+                        },
+                        limitLabel1: {
+                            type: 'label',
+                            xValue: water,
+                            content: ['Water Minimum']
+                        },
+                    }
+                }
+            },
+            indexAxis: 'y',
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    max: limitWater
+                }
+            }
+        }
+    });
+    </script>
+</div>
+
+<!-- WATER ALERT BASED ON DAILY LEVELS-->
+{% if waterAlert %}
+    <div class="alert alert-warning d-flex align-items-center" role="alert">
+        <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Warning:"><use xlink:href="#exclamation-triangle-fill"/></svg>
+        <div style="display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 30px;
+        width: 100%;
+        virtical-align: middle">
+            <p>&nbsp &nbsp You have exceeded your reccomended water levels for the day!</p>
+        </div>
+    </div>
+{% endif %}
+
+
+<div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.0.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/2.1.0/chartjs-plugin-annotation.min.js" integrity="sha512-1uGDhRiDlpOPrTi54rJHu3oBLizqaadZDDft+j4fVeFih6eQBeRPJuuP3JcxIqJxIjzOmRq57XwwO4FT+/owIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <canvas id="myChartSodium" width="400" height="35"></canvas>
     <script src="path/to/chartjs/dist/chart.min.js"></script>
     <script src="path/to/chartjs-plugin-annotation/dist/chartjs-plugin-annotation.min.js"></script>
     <script>
     sodiumLimit1 = {{recByMicro.sodium_min}};
     sodiumLimit2 = {{recByMicro.sodium_max}};
+
+    limitSodium = 0
+
+    if ({{actualByDay.sodium}} > {{recByMicro.sodium_max}}){
+        limitSodium = {{actualByDay.sodium}} + 1000
+    } else if ({{recByMicro.sodium_max}} > {{actualByDay.sodium}}) {
+        limitSodium = {{recByMicro.sodium_max}} + 1000
+    } else
+        limitSodium = {{recByMicro.sodium_max}} + 1000
+
     const ctxSodium = document.getElementById('myChartSodium').getContext('2d');
     const myChartSodium = new Chart(ctxSodium, {
         type: 'bar',
         data: {
             labels: ['Sodium'],
             datasets: [{
-                label: 'Amount Of Sodium',
+                label: 'Amount Of Sodium (mg)',
                 data: [{{actualByDay.sodium}}],
                 backgroundColor: [
-                    'rgba(255, 99, 132, 0.6)',
-                    'rgba(54, 162, 235, 0.6)',
-                    'rgba(255, 206, 86, 0.6)',
-                    'rgba(75, 192, 192, 0.6)',
-                    'rgba(153, 102, 255, 0.6)',
-                    'rgba(255, 159, 64, 0.6)'
+                    '#cd91e6'
                 ],
                 borderColor: [
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)',
-                    'rgba(255, 159, 64, 1)'
+                    '#8D188F'
                 ],
                 borderWidth: 1
             }]
@@ -75,7 +177,7 @@
                         limitLabel1: {
                             type: 'label',
                             xValue: sodiumLimit1,
-                            content: ['Sodium Minimum']
+                            content: ['Sodium Minimum'],
                         },
                         limitLabel2: {
                             type: 'label',
@@ -89,7 +191,7 @@
             scales: {
                 x: {
                     beginAtZero: true,
-                    max: {{recByMicro.sodium_max}} + 1000
+                    max: limitSodium
                 }
             }
         }
@@ -97,38 +199,49 @@
     </script>
 </div>
 
+<!-- Sodium ALERT BASED ON DAILY LEVELS-->
+{% if sodiumAlert %}
+<div class="alert alert-warning d-flex align-items-center" role="alert">
+    <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Warning:"><use xlink:href="#exclamation-triangle-fill"/></svg>
+    <div>
+        <p>&nbsp &nbsp You have exceeded your reccomended sodiumn levels for the day!</p>
+    </div>
+</div>
+{% endif %}
+
 <div>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.0.1/dist/chart.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/2.1.0/chartjs-plugin-annotation.min.js" integrity="sha512-1uGDhRiDlpOPrTi54rJHu3oBLizqaadZDDft+j4fVeFih6eQBeRPJuuP3JcxIqJxIjzOmRq57XwwO4FT+/owIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <canvas id="myChartSodium" width="400" height="50"></canvas>
+    <canvas id="myChartPotassium" width="400" height="35"></canvas>
     <script src="path/to/chartjs/dist/chart.min.js"></script>
     <script src="path/to/chartjs-plugin-annotation/dist/chartjs-plugin-annotation.min.js"></script>
     <script>
-    sodiumLimit1 = {{recByMicro.sodium_min}};
-    sodiumLimit2 = {{recByMicro.sodium_max}};
-    const ctxProtein = document.getElementById('myChartProtein').getContext('2d');
-    const myChartProtein = new Chart(ctxProtein, {
+    potassiumLimit1 = {{recByMicro.potassium_min}};
+    potassiumLimit2 = {{recByMicro.potassium_max}};
+
+    limitPotassium = 0
+
+    if ({{actualByDay.potassium}} > {{recByMicro.potassium_max}}){
+        limitPotassium = {{actualByDay.potassium}} + 1000
+    } else if ({{recByMicro.potassium_max}} > {{actualByDay.potassium}}) {
+        limitPotassium = {{recByMicro.potassium_max}} + 1000
+    } else
+        limitPotassium = {{recByMicro.potassium_max}} + 1000
+
+
+    const ctxPotassium = document.getElementById('myChartPotassium').getContext('2d');
+    const myChartPotassium = new Chart(ctxPotassium, {
         type: 'bar',
         data: {
-            labels: ['Protein'],
+            labels: ['Potassium'],
             datasets: [{
-                label: 'Amount Of Protein',
-                data: [{{actualByDay.sodium}}],
+                label: 'Amount Of Potassium (mg)',
+                data: [{{actualByDay.potassium}}],
                 backgroundColor: [
-                    'rgba(255, 99, 132, 0.6)',
-                    'rgba(54, 162, 235, 0.6)',
-                    'rgba(255, 206, 86, 0.6)',
-                    'rgba(75, 192, 192, 0.6)',
-                    'rgba(153, 102, 255, 0.6)',
-                    'rgba(255, 159, 64, 0.6)'
+                    '#de7cb4'
                 ],
                 borderColor: [
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)',
-                    'rgba(255, 159, 64, 1)'
+                    '#DD2B90'
                 ],
                 borderWidth: 1
             }]
@@ -140,27 +253,27 @@
                     annotations: {
                         limitLine1: {
                             type: 'line',
-                            xMin: sodiumLimit1,
-                            xMax: sodiumLimit1,
+                            xMin: potassiumLimit1,
+                            xMax: potassiumLimit1,
                             backgroundColor: 'black',
                             borderWidth: 5,
                         },
                         limitLine2: {
                             type: 'line',
-                            xMin: sodiumLimit2,
-                            xMax: sodiumLimit2,
+                            xMin: potassiumLimit2,
+                            xMax: potassiumLimit2,
                             backgroundColor: 'black',
                             borderWidth: 5,
                         },
                         limitLabel1: {
                             type: 'label',
-                            xValue: sodiumLimit1,
-                            content: ['Sodium Minimum']
+                            xValue: potassiumLimit1,
+                            content: ['Potassium Minimum']
                         },
                         limitLabel2: {
                             type: 'label',
-                            xValue: sodiumLimit2,
-                            content: ['Sodium Maximum']
+                            xValue: potassiumLimit2,
+                            content: ['Potassium Maximum']
                         }
                     }
                 }
@@ -169,7 +282,7 @@
             scales: {
                 x: {
                     beginAtZero: true,
-                    max: {{recByMicro.sodium_max}} + 1000
+                    max: limitPotassium
                 }
             }
         }
@@ -177,36 +290,48 @@
     </script>
 </div>
 
+<!-- Potassium ALERT BASED ON DAILY LEVELS-->
+{% if potassiumAlert %}
+    <div class="alert alert-warning d-flex align-items-center" role="alert">
+        <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Warning:"><use xlink:href="#exclamation-triangle-fill"/></svg>
+        <div>
+            <p>&nbsp &nbsp You have exceeded your reccomended potassium levels for the day!</p>
+        </div>
+    </div>
+{% endif %}
+
 <div>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.0.1/dist/chart.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/2.1.0/chartjs-plugin-annotation.min.js" integrity="sha512-1uGDhRiDlpOPrTi54rJHu3oBLizqaadZDDft+j4fVeFih6eQBeRPJuuP3JcxIqJxIjzOmRq57XwwO4FT+/owIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <canvas id="myChart8" width="400" height="50"></canvas>
+    <canvas id="myChartphos" width="400" height="35"></canvas>
     <script src="path/to/chartjs/dist/chart.min.js"></script>
     <script src="path/to/chartjs-plugin-annotation/dist/chartjs-plugin-annotation.min.js"></script>
     <script>
-    const ctx8 = document.getElementById('myChart8').getContext('2d');
-    const myChart8 = new Chart(ctx8, {
+    phosLimit1 = {{recByMicro.phos_min}};
+    phosLimit2 = {{recByMicro.phos_max}};
+
+    limitPhos = 0
+
+    if ({{actualByDay.phos}} > {{recByMicro.phos_max}}){
+        limitPhos = {{actualByDay.phos}} + 500
+    } else if ({{recByMicro.phos_max}} > {{actualByDay.phos}}) {
+        limitPhos = {{recByMicro.phos_max}} + 500
+    } else
+        limitPhos = {{recByMicro.phos_max}} + 500
+
+    const ctxphos = document.getElementById('myChartphos').getContext('2d');
+    const myChartphos = new Chart(ctxphos, {
         type: 'bar',
         data: {
-            labels: ['Red'],
+            labels: ['Phosphorus'],
             datasets: [{
-                label: '# of Votes',
-                data: [12],
+                label: 'Amount Of Phosphorus (mg)',
+                data: [{{actualByDay.phos}}],
                 backgroundColor: [
-                    'rgba(255, 99, 132, 0.2)',
-                    'rgba(54, 162, 235, 0.2)',
-                    'rgba(255, 206, 86, 0.2)',
-                    'rgba(75, 192, 192, 0.2)',
-                    'rgba(153, 102, 255, 0.2)',
-                    'rgba(255, 159, 64, 0.2)'
+                    '#9cf7a7'
                 ],
                 borderColor: [
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)',
-                    'rgba(255, 159, 64, 1)'
+                    '#2F9D0A'
                 ],
                 borderWidth: 1
             }]
@@ -216,16 +341,29 @@
                 autocolors: false,
                 annotation: {
                     annotations: {
-                        line1: {
+                        limitLine1: {
                             type: 'line',
-                            xMin: 10,
-                            xMax: 10,
-                            backgroundColor: 'black'
+                            xMin: phosLimit1,
+                            xMax: phosLimit1,
+                            backgroundColor: 'black',
+                            borderWidth: 5,
                         },
-                        label1: {
+                        limitLine2: {
+                            type: 'line',
+                            xMin: phosLimit2,
+                            xMax: phosLimit2,
+                            backgroundColor: 'black',
+                            borderWidth: 5,
+                        },
+                        limitLabel1: {
                             type: 'label',
-                            xValue: 10,
-                            content: ['Macro Nutrient Recommended']
+                            xValue: phosLimit1,
+                            content: ['Phos Minimum']
+                        },
+                        limitLabel2: {
+                            type: 'label',
+                            xValue: phosLimit2,
+                            content: ['Phos Maximum']
                         }
                     }
                 }
@@ -234,7 +372,7 @@
             scales: {
                 x: {
                     beginAtZero: true,
-                    max: 20
+                    max: limitPhos
                 }
             }
         }
@@ -242,15 +380,136 @@
     </script>
 </div>
 
+<!-- phos ALERT BASED ON DAILY LEVELS-->
+{% if phosAlert %}
+    <div class="alert alert-warning d-flex align-items-center" role="alert">
+        <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Warning:"><use xlink:href="#exclamation-triangle-fill"/></svg>
+        <div>
+            <p>&nbsp &nbsp You have exceeded your reccomended phosphorus levels for the day!</p>
+        </div>
+    </div>
+{% endif %}
 
+<div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.0.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/2.1.0/chartjs-plugin-annotation.min.js" integrity="sha512-1uGDhRiDlpOPrTi54rJHu3oBLizqaadZDDft+j4fVeFih6eQBeRPJuuP3JcxIqJxIjzOmRq57XwwO4FT+/owIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <canvas id="myChartprotien" width="400" height="35"></canvas>
+    <script src="path/to/chartjs/dist/chart.min.js"></script>
+    <script src="path/to/chartjs-plugin-annotation/dist/chartjs-plugin-annotation.min.js"></script>
+
+    <script> 
+    protienLimit1 =  {{recByMicro.protien_limit}};
+    const ctxprotien = document.getElementById('myChartprotien').getContext('2d');
+    const myChartprotien = new Chart(ctxprotien, {
+        type: 'bar',
+        data: {
+            labels: ['Protien'],
+            datasets: [{
+                label: 'Amount Of Protien(g)',
+                data: [{{actualByDay.protien}}],
+                backgroundColor: [
+                    '#fab669'
+                ],
+                borderColor: [
+                    '#A55407'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            plugins: {
+                autocolors: false,
+                annotation: {
+                    annotations: {
+                        limitLine1: {
+                            type: 'line',
+                            xMin: protienLimit1,
+                            xMax: protienLimit1,
+                            backgroundColor: 'black',
+                            borderWidth: 5,
+                        },
+                        limitLabel1: {
+                            type: 'label',
+                            xValue: protienLimit1,
+                            content: ['protienGoal'],
+                        },
+                    }
+                }
+            },
+            indexAxis: 'y',
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    max: {{recByMicro.protien_limit}} + 50
+                }
+            }
+        }
+    });
+    </script>
+</div>
+
+<!-- PROTIEN ALERT BASED ON DAILY LEVELS-->
+{% if protienAlert %}
+    <div class="alert alert-warning d-flex align-items-center" role="alert">
+        <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Warning:"><use xlink:href="#exclamation-triangle-fill"/></svg>
+        <div>
+            <p>&nbsp &nbsp You have exceeded your reccomended protien levels for the day!</p>
+        </div>
+    </div>
+{% endif %}
+
+<br><br><br>
+
+
+
+<!-- LINE GRAPH  -->
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
 <div>
-<!-- <h3>{{actualSodiumValue}}</h3> -->
-<h3>{{test}}</h3>
-<!-- <h3>{% for value in actualSodiumValue%} '{{value.sodium_mg}}' {%endfor%}</h3> -->
+{% if logsFound %}
+<h1>Explore trends in nutrients for {{curr_user.first_name}} {{curr_user.last_name}}</h1>
+<h5> for the last {{timeRange}} days, beginning on {{curr_date}}</h5>
+{%else %}
+<h3> I should be an alert probably, but anyways'all didn't find any logs for this date range </h3>
+{%endif%}
+<div class="row">
+<label for="microType" class='col'>Choose a nutrient:</label>
+<label for="startDate" class='col'> Choose a start date:</label>
+<label for="startDate" class='col'> Choose range of days:</label>
+<label class='col'>                </label>
+</div>
+<form action="{% url 'reports' %}" id="microType" method="POST" name="microType"> {% csrf_token %}
+    <div class="form-row">
+        <div class="col">
+    <select name="nutrientSelect" id="nutrientSelect" form="microType" class="form-control" value="protien" required>
+        <option hidden disabled selected value>--Select an option--</option>
+        <option value="protien">Protien</option>
+        <option value="phosphorus">Phosphorus</option>
+        <option value="water">Water</option>
+        <option value="potassium">Potassium</option>
+        <option value="sodium">Sodium</option>
+      </select>
+    </div>
+    <div class="col">
+    <input type="date" id="startDate" name="startDate" class="form-control" required>
+    </div>
+    <div class="col">
+    <select name="dateRange" id="dateRange" form="microType" class="form-control" value="7" required>
+        <option hidden disabled selected value>--Select an option--</option>
+        <option value="7">Week</option>
+        <option value="30">Month</option>
+      </select>
+    </div>
+    <div class="col">
+    <input class = 'btn btn-success form-control' type='submit' value = 'Submit'>
+    </div>
+</div>
+  </form>
+  
+
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
-    <canvas id="myChart2" width="400" height="300"></canvas>
+    <canvas id="myChart2" width="200" height="100"></canvas>
     <script>
         const ctx2 = document.getElementById('myChart2').getContext('2d');
         const myChart2 = new Chart(ctx2, {
@@ -258,8 +517,8 @@
             data: {
               labels: [{% for today in datesWeek %} '{{today}}', {% endfor %}],
                 datasets: [{
-                    label: 'Micronutrient Trends',
-                    data: [{% for micro in recMicroNutrients %} '{{recMicroNutrients.value}}', {% endfor %}],
+                    label: '{{nutrientType}}',
+                    data: [{% for day in sliceNutrient %} '{{day}}', {% endfor %}],
                     backgroundColor: [
                         'rgba(255, 99, 132, 0.2)',
                         'rgba(54, 162, 235, 0.2)',

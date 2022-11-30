@@ -1,0 +1,47 @@
+{% extends 'partials/base.html'%}
+
+{% load crispy_forms_tags %}
+ 
+{% block title %} Food Entry {% endblock %}
+ 
+{% block content %}
+<br>
+<h1>Food Journal Update</h1>
+<div class = "border p-3 shadow">
+    <h4>Edit Your Entry</h4>
+    <hr>
+    <form method="POST">
+        {% csrf_token %}
+        <label for='username'>Username *</label>
+        <input class="form-control" type="text" name='username' id='username' value='{{record.username}}' required>
+        <br>
+        <label for='date'>Date *</label>
+        <input class="form-control" type="date" name='date' id='date' value='{{record.date}}' required>
+        <br>
+        <label for='meal_type'>Meal Type *</label>
+        <input class="form-control" type="text" name='meal_type' id='meal_type' value='{{record.meal_type}}' required>
+        <br>
+        <label for='food_name'>Food Name *</label>
+        <select class="form-control" name="food_name" id="food_name" required>
+            <option hidden disabled selected value>--Select an option--</option>
+        {% for food in foods %}
+            <option value="{{ food.id }}">{{ food }}</option>
+        {% endfor %} 
+        </select>
+        <br>
+        <label for='quantity'>Quantity *</label>
+        <input class="form-control" type="number" name='quantity' id='quantity' value='{{record.quantity}}' required>
+        <br>
+        <label for='measurement'>Measurement *</label>
+        <select class="form-control" name="measurement" id="measurement" required>
+            <option hidden disabled selected value>--Select an option--</option>
+            {% for measure in measures %}
+                <option value="{{ measure.id }}">{{ measure }}</option>
+            {% endfor %} 
+            </select>        <br>
+        <input class = 'btn btn-success btn-block' type='submit' value = 'Log Food'>
+    </form>
+</div>
+<br><br>
+
+{% endblock %}

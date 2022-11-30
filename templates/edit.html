@@ -23,6 +23,8 @@
         <th>Food Name</th>
         <th>Quantity</th>
         <th>Measurement</th>
+        <th>Edit</th>
+        <th>Delete</th>
     </tr>
     
     {% for row in data %}
@@ -33,13 +35,11 @@
         <td>{{row.food_name}}</td>
         <td>{{row.quantity}}</td>
         <td>{{row.measurement}}</td>
-        <td> <button>Edit</button></td>
-        <td><a href="{% url ">Edit</a></td>
-        <td> <button>Delete</button></td>
+        <td><a href="{% url 'edit' id=row.id %}">Edit</a></td>
+        <td><a href="{% url 'delete' id=row.id %}" onclick="if (confirm('Do you want to delete the food log?')){return true;}else{event.stopPropagation(); event.preventDefault();};">Delete</a></td>
     </tr>
     {% endfor %}
     
-
 </table>
 
 {% endblock %}
