@@ -1,0 +1,45 @@
+{% extends 'partials/base.html'%}
+
+{% load crispy_forms_tags %}
+
+{% block title %} Edit Food Log {% endblock %}
+ 
+{% block content %}
+
+<h1>Edit Logs HERE</h1>
+<style>
+    table, th, td {
+        border: 1px solid black;
+        border-collapse: collapse;
+        text-align: center;
+      }
+    tr:hover {background-color: #D6EEEE;}
+</style>
+<table style="width:100%">
+    <tr>
+        <th>Username</th>
+        <th>Date</th>
+        <th>Meal Type</th>
+        <th>Food Name</th>
+        <th>Quantity</th>
+        <th>Measurement</th>
+    </tr>
+    
+    {% for row in data %}
+    <tr>
+        <td>{{row.username}}</td>
+        <td>{{row.date}}</td>
+        <td>{{row.meal_type}}</td>
+        <td>{{row.food_name}}</td>
+        <td>{{row.quantity}}</td>
+        <td>{{row.measurement}}</td>
+        <td> <button>Edit</button></td>
+        <td><a href="{% url ">Edit</a></td>
+        <td> <button>Delete</button></td>
+    </tr>
+    {% endfor %}
+    
+
+</table>
+
+{% endblock %}

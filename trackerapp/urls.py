@@ -7,5 +7,6 @@ urlpatterns = [
     path('foodentry/', views.foodEntryPageView, name='food_entry'),
     path('reports/', views.reportsPageView, name='reports'),
     path('login/', views.loginPageView, name='login'),
-    path('add/', views.loginPageView, name='add_food'),
+    path('add/', views.addfoodEntryPageView, name='add_food'),
+    path('editpage/', views.editPageView, name='editpage'),
 ]

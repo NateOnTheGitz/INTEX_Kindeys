@@ -1,150 +1,253 @@
 {% extends 'partials/base.html'%}
- 
+
 {% block title %} Reports {% endblock %}
  
 {% block content %}
+{% comment %} <script src="path/to/chartjs/dist/chart.min.js"></script>
+<script src="path/to/chartjs-plugin-annotation/dist/chartjs-plugin-annotation.min.js"></script> {% endcomment %}
 <br><br><br>
 <h1>View your reports here</h1>
 <br>
+<a href="{% url 'editpage' %}">Edit Entries</a>
+<br>
+<select class="form-control" id="report_user">
+    {% for user in users %}
+    <option value="{{users.id}}">{{user}}</option>
+    <p>{{user}}</p>
+    {% endfor %}
+</select>
+<br>
 <div>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.0.1/dist/chart.umd.min.js"></script>
-  <canvas id="myChart9" width="400" height="50"></canvas>
-  <script>
-  const ctx9 = document.getElementById('myChart9').getContext('2d');
-  const myChart9 = new Chart(ctx9, {
-      type: 'bar',
-      data: {
-          labels: ['Red'],
-          datasets: [{
-              label: '# of Votes',
-              data: [12],
-              backgroundColor: [
-                  'rgba(255, 99, 132, 0.8)',
-                  'rgba(54, 162, 235, 0.8)',
-                  'rgba(255, 206, 86, 0.8)',
-                  'rgba(75, 192, 192, 0.8)',
-                  'rgba(153, 102, 255, 0.8)',
-                  'rgba(255, 159, 64, 0.8)'
-              ],
-              borderColor: [
-                  'rgba(255, 99, 132, 1)',
-                  'rgba(54, 162, 235, 1)',
-                  'rgba(255, 206, 86, 1)',
-                  'rgba(75, 192, 192, 1)',
-                  'rgba(153, 102, 255, 1)',
-                  'rgba(255, 159, 64, 1)'
-              ],
-              borderWidth: 5,
-          }]
-      },
-      options: {
-        responsive: true,
-        indexAxis: 'y',
-          scales: {
-              x: {
-                beginAtZero: true,
-                max:15
-            }
-          }
-      }
-  });
-  </script>
-</div>
-
-<div>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.0.1/dist/chart.umd.min.js"></script>
-  <canvas id="myChart8" width="400" height="50"></canvas>
-  <script>
-  const ctx8 = document.getElementById('myChart8').getContext('2d');
-  const myChart8 = new Chart(ctx8, {
-      type: 'bar',
-      data: {
-          labels: ['Red'],
-          datasets: [{
-              label: '# of Votes',
-              data: [12],
-              backgroundColor: [
-                  'rgba(255, 99, 132, 0.8)',
-                  'rgba(54, 162, 235, 0.8)',
-                  'rgba(255, 206, 86, 0.8)',
-                  'rgba(75, 192, 192, 0.8)',
-                  'rgba(153, 102, 255, 0.8)',
-                  'rgba(255, 159, 64, 0.8)'
-              ],
-              borderColor: [
-                  'rgba(255, 99, 132, 1)',
-                  'rgba(54, 162, 235, 1)',
-                  'rgba(255, 206, 86, 1)',
-                  'rgba(75, 192, 192, 1)',
-                  'rgba(153, 102, 255, 1)',
-                  'rgba(255, 159, 64, 1)'
-              ],
-              borderWidth: 5
-          }]
-      },
-      options: {
-        indexAxis: 'y',
-          scales: {
-              x: {
-                  beginAtZero: true,
-                  max:15
-              }
-          }
-      }
-  });
-  </script>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
-<div>
-  <h3> </h3>
-    <canvas id="myChart" width="400" height="300"></canvas>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.0.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/2.1.0/chartjs-plugin-annotation.min.js" integrity="sha512-1uGDhRiDlpOPrTi54rJHu3oBLizqaadZDDft+j4fVeFih6eQBeRPJuuP3JcxIqJxIjzOmRq57XwwO4FT+/owIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <canvas id="myChartSodium" width="400" height="50"></canvas>
+    <script src="path/to/chartjs/dist/chart.min.js"></script>
+    <script src="path/to/chartjs-plugin-annotation/dist/chartjs-plugin-annotation.min.js"></script>
     <script>
-        const ctx = document.getElementById('myChart').getContext('2d');
-        const myChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: [{% for today in datesWeek %} '{{today}}', {% endfor %}],
-                datasets: [{
-                    label: 'Micronutrients',
-                    data: [{% for micro in recMicroNutrients %} '{{recMicroNutrients}}', {% endfor %}],
-                    backgroundColor: [
-                        'rgba(255, 99, 132, 0.2)',
-                        'rgba(54, 162, 235, 0.2)',
-                        'rgba(255, 206, 86, 0.2)',
-                        'rgba(75, 192, 192, 0.2)',
-                        'rgba(153, 102, 255, 0.2)',
-                        'rgba(255, 159, 64, 0.2)'
-                    ],
-                    borderColor: [
-                        'rgba(255, 99, 132, 1)',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(153, 102, 255, 1)',
-                        'rgba(255, 159, 64, 1)'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                layout: {
-                    padding:20
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true
+    sodiumLimit1 = {{recByMicro.sodium_min}};
+    sodiumLimit2 = {{recByMicro.sodium_max}};
+    const ctxSodium = document.getElementById('myChartSodium').getContext('2d');
+    const myChartSodium = new Chart(ctxSodium, {
+        type: 'bar',
+        data: {
+            labels: ['Sodium'],
+            datasets: [{
+                label: 'Amount Of Sodium',
+                data: [{{actualByDay.sodium}}],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.6)',
+                    'rgba(54, 162, 235, 0.6)',
+                    'rgba(255, 206, 86, 0.6)',
+                    'rgba(75, 192, 192, 0.6)',
+                    'rgba(153, 102, 255, 0.6)',
+                    'rgba(255, 159, 64, 0.6)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            plugins: {
+                autocolors: false,
+                annotation: {
+                    annotations: {
+                        limitLine1: {
+                            type: 'line',
+                            xMin: sodiumLimit1,
+                            xMax: sodiumLimit1,
+                            backgroundColor: 'black',
+                            borderWidth: 5,
+                        },
+                        limitLine2: {
+                            type: 'line',
+                            xMin: sodiumLimit2,
+                            xMax: sodiumLimit2,
+                            backgroundColor: 'black',
+                            borderWidth: 5,
+                        },
+                        limitLabel1: {
+                            type: 'label',
+                            xValue: sodiumLimit1,
+                            content: ['Sodium Minimum']
+                        },
+                        limitLabel2: {
+                            type: 'label',
+                            xValue: sodiumLimit2,
+                            content: ['Sodium Maximum']
+                        }
                     }
                 }
+            },
+            indexAxis: 'y',
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    max: {{recByMicro.sodium_max}} + 1000
+                }
             }
-        });
+        }
+    });
     </script>
 </div>
 
 <div>
-<h3>{{actualSodiumValue}}</h3>
-<!-- <h3>{% for value in actualSodiumQuantity%} '{{value}}' {%endfor%}</h3> -->
-<!-- <h3>{{test}}</h3> -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.0.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/2.1.0/chartjs-plugin-annotation.min.js" integrity="sha512-1uGDhRiDlpOPrTi54rJHu3oBLizqaadZDDft+j4fVeFih6eQBeRPJuuP3JcxIqJxIjzOmRq57XwwO4FT+/owIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <canvas id="myChartSodium" width="400" height="50"></canvas>
+    <script src="path/to/chartjs/dist/chart.min.js"></script>
+    <script src="path/to/chartjs-plugin-annotation/dist/chartjs-plugin-annotation.min.js"></script>
+    <script>
+    sodiumLimit1 = {{recByMicro.sodium_min}};
+    sodiumLimit2 = {{recByMicro.sodium_max}};
+    const ctxProtein = document.getElementById('myChartProtein').getContext('2d');
+    const myChartProtein = new Chart(ctxProtein, {
+        type: 'bar',
+        data: {
+            labels: ['Protein'],
+            datasets: [{
+                label: 'Amount Of Protein',
+                data: [{{actualByDay.sodium}}],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.6)',
+                    'rgba(54, 162, 235, 0.6)',
+                    'rgba(255, 206, 86, 0.6)',
+                    'rgba(75, 192, 192, 0.6)',
+                    'rgba(153, 102, 255, 0.6)',
+                    'rgba(255, 159, 64, 0.6)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            plugins: {
+                autocolors: false,
+                annotation: {
+                    annotations: {
+                        limitLine1: {
+                            type: 'line',
+                            xMin: sodiumLimit1,
+                            xMax: sodiumLimit1,
+                            backgroundColor: 'black',
+                            borderWidth: 5,
+                        },
+                        limitLine2: {
+                            type: 'line',
+                            xMin: sodiumLimit2,
+                            xMax: sodiumLimit2,
+                            backgroundColor: 'black',
+                            borderWidth: 5,
+                        },
+                        limitLabel1: {
+                            type: 'label',
+                            xValue: sodiumLimit1,
+                            content: ['Sodium Minimum']
+                        },
+                        limitLabel2: {
+                            type: 'label',
+                            xValue: sodiumLimit2,
+                            content: ['Sodium Maximum']
+                        }
+                    }
+                }
+            },
+            indexAxis: 'y',
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    max: {{recByMicro.sodium_max}} + 1000
+                }
+            }
+        }
+    });
+    </script>
+</div>
+
+<div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.0.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/2.1.0/chartjs-plugin-annotation.min.js" integrity="sha512-1uGDhRiDlpOPrTi54rJHu3oBLizqaadZDDft+j4fVeFih6eQBeRPJuuP3JcxIqJxIjzOmRq57XwwO4FT+/owIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <canvas id="myChart8" width="400" height="50"></canvas>
+    <script src="path/to/chartjs/dist/chart.min.js"></script>
+    <script src="path/to/chartjs-plugin-annotation/dist/chartjs-plugin-annotation.min.js"></script>
+    <script>
+    const ctx8 = document.getElementById('myChart8').getContext('2d');
+    const myChart8 = new Chart(ctx8, {
+        type: 'bar',
+        data: {
+            labels: ['Red'],
+            datasets: [{
+                label: '# of Votes',
+                data: [12],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            plugins: {
+                autocolors: false,
+                annotation: {
+                    annotations: {
+                        line1: {
+                            type: 'line',
+                            xMin: 10,
+                            xMax: 10,
+                            backgroundColor: 'black'
+                        },
+                        label1: {
+                            type: 'label',
+                            xValue: 10,
+                            content: ['Macro Nutrient Recommended']
+                        }
+                    }
+                }
+            },
+            indexAxis: 'y',
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    max: 20
+                }
+            }
+        }
+    });
+    </script>
+</div>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+<div>
+<!-- <h3>{{actualSodiumValue}}</h3> -->
+<h3>{{test}}</h3>
 <!-- <h3>{% for value in actualSodiumValue%} '{{value.sodium_mg}}' {%endfor%}</h3> -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
     <canvas id="myChart2" width="400" height="300"></canvas>

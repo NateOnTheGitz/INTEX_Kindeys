@@ -18,23 +18,8 @@
 </div>
 <br>
 <div class = "border p-3 shadow">
-    <h4>Don't see your food? Add it here!</h4>
-    <hr>
-    <form method="POST">
-        {% csrf_token %}
-        <div class="form-group">
-            <label for="exampleFormControlSelect1">Enter Food Name:</label>
-            <input class="form-control" type="text">
-            <br>
-            <label for="exampleFormControlSelect1">Select Measurement Type:</label>
-            {% comment %} <select name="" id=""></select> {% endcomment %}
-            <p>something cool will go here</p>
-            <label for="exampleFormControlSelect1">Sodium (mg):</label>
-            <input class="form-control" type="number">
-            <label for="exampleFormControlSelect1">Sodium:</label>
-            <input class="form-control" type="number">
-        </div>
-    </form>
+    <a href="{% url 'add_food' %}">
+    <h4>Don't see your food? Click here to add it!</h4>
 </div>
 
 <br><br>
