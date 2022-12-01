@@ -3,6 +3,7 @@
 {% block title %} Reports {% endblock %}
  
 {% block content %}
+
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
     <symbol id="check-circle-fill" fill="currentColor" viewBox="0 0 16 16">
       <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
@@ -18,15 +19,31 @@
 {% comment %} <script src="path/to/chartjs/dist/chart.min.js"></script>
 <script src="path/to/chartjs-plugin-annotation/dist/chartjs-plugin-annotation.min.js"></script> {% endcomment %}
 <br><br><br>
-<h1>View daily totals</h1>
-<h3> {{test}} </h3>
+<h3>View daily totals for {{curr_date_for_bar}}</h3>
+{% comment %} <h1> {% for user in test%} '{{user}}' {%endfor%} {% endcomment %}
+{% comment %} <h3> {{test}} </h3> {% endcomment %}
 <br>
-<a href="{% url 'editpage' %}">Edit Entries</a>
 <br>
 {% block userselect %}
 
 {% endblock %}
 
+{% if logsFound == False %}
+<div class="alert alert-danger d-flex align-items-center" role="alert">
+    <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg>
+    <div style="display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 10px;
+    width: 100%;
+    virtical-align: middle;
+    font-size: 20px">
+      No Food Entries Today
+    </div>
+  </div>
+{% endif %}
+
+<div class="container-sm">
 <div>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.0.1/dist/chart.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/2.1.0/chartjs-plugin-annotation.min.js" integrity="sha512-1uGDhRiDlpOPrTi54rJHu3oBLizqaadZDDft+j4fVeFih6eQBeRPJuuP3JcxIqJxIjzOmRq57XwwO4FT+/owIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -107,12 +124,7 @@
 {% if waterAlert %}
     <div class="alert alert-warning d-flex align-items-center" role="alert">
         <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Warning:"><use xlink:href="#exclamation-triangle-fill"/></svg>
-        <div style="display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 30px;
-        width: 100%;
-        virtical-align: middle">
+        <div>
             <p>&nbsp &nbsp You have exceeded your recommended water levels for the day!</p>
         </div>
     </div>
@@ -207,6 +219,32 @@
         <p>&nbsp &nbsp You have exceeded your recommended sodiumn levels for the day!</p>
     </div>
 </div>
+<div>
+    <p>
+        <button class="btn btn-info btn-sm" type="button" data-toggle="collapse" data-target="#collapseSodium" aria-expanded="false" aria-controls="collapseSodium">Food Recommendations</button>
+      </p>
+      <div class="row">
+        <div class="col">
+          <div class="collapse" id="collapseSodium">
+            <div class="card card-body">
+                <b>Suggestions:</b>
+                <ul>
+                <li>Buy fresh food often. Sodium (a part of salt) is added to many prepared or packaged foods you buy at the supermarket or at restaurants.</li>
+               <li>Cook foods from scratch instead of eating prepared foods, “fast” foods, frozen dinners, and canned foods that are higher in sodium. When you prepare your own food, you control what goes into it.
+            </li>
+               <li>Use spices, herbs, and sodium-free seasonings in place of salt.
+            </li>
+                <li>Check for sodium on the Nutrition Facts label of food packages. A Daily Value of 20 percent or more means the food is high in sodium.</li>
+                <li> Try lower-sodium versions of frozen dinners and other convenience foods. </li>
+                <li>  Rinse canned vegetables, beans, meats, and fish with water before eating. </li>
+            </ul>
+            </div>
+          </div>
+        </div>
+    </div>
+</div>
+
+
 {% endif %}
 
 <div>
@@ -298,6 +336,49 @@
             <p>&nbsp &nbsp You have exceeded your recommended potassium levels for the day!</p>
         </div>
     </div>
+    <div>
+        <p>
+                   <button class="btn btn-info btn-sm" type="button" data-toggle="collapse" data-target=".multi-collapse" aria-expanded="false" aria-controls="multiCollapseExample1 multiCollapseExample2">Food Recommendations</button>
+          </p>
+          <div class="row">
+            <div class="col">
+              <div class="collapse multi-collapse" id="multiCollapseExample1">
+                <div class="card card-body">
+                    <b>Avoid:</b>
+                    <ul>
+                    <li>Oranges, bananas, and orange juice</li>
+                   <li>Potatoes, tomatoes</li>
+                   <li>Brown and wild rice</li>
+                    <li>Bran cereals</li>
+                    <li>Whole-wheat bread and pasta</li>
+                    <li>Dairy foods</li>
+                    <li>Beans and nuts</li>
+                </ul>
+    
+                </div>
+              </div>
+            </div>
+            <div class="col">
+              <div class="collapse multi-collapse" id="multiCollapseExample2">
+                <div class="card card-body">
+                    <b>Consider Eating:</b>
+                    <ul>
+    
+                     <li>Apples, peaches</li>
+                     <li>Carrots, green beans</li>
+                     <li>Rice milk (not enriched)</li>
+                     <li>White bread and pasta</li>
+                     <li>White rice</li
+                     <li>Cooked rice and wheat cereals, grits</li>
+                     <li>Apple, grape, or cranberry juice</li>
+                    </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
+    
 {% endif %}
 
 <div>
@@ -382,12 +463,54 @@
 
 <!-- phos ALERT BASED ON DAILY LEVELS-->
 {% if phosAlert %}
-    <div class="alert alert-warning d-flex align-items-center" role="alert">
-        <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Warning:"><use xlink:href="#exclamation-triangle-fill"/></svg>
+<div class="container-sm">
+<div class="align-text-bottom">
+    <div class="alert alert-warning d-flex align-items-bottom h-25" role="alert">
+        <svg class="bi flex-shrink-0 me-2" width="24" height="12" role="img" aria-label="Warning:"><use xlink:href="#exclamation-triangle-fill"/></svg>
         <div>
             <p>&nbsp &nbsp You have exceeded your recommended phosphorus levels for the day!</p>
         </div>
     </div>
+</div>
+</div>
+<div>
+    <p>
+               <button class="btn btn-info btn-sm" type="button" data-toggle="collapse" data-target=".multi-collapse" aria-expanded="false" aria-controls="multiCollapseExample1 multiCollapseExample2">Food Recommendations</button>
+      </p>
+      <div class="row">
+        <div class="col">
+          <div class="collapse multi-collapse" id="multiCollapseExample1">
+            <div class="card card-body">
+                <b>Avoid:</b>
+                <ul>
+                <li>Meat, poultry, fish</li>
+               <li> Bran cereals and oatmeal</li>
+               <li> Dairy foods</li>
+                <li> Beans, lentils, nuts</li>
+                <li> Dark-colored sodas/pop, fruit punch, some bottled or canned iced teas that have added phosphorus </li>
+            </ul>
+
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="collapse multi-collapse" id="multiCollapseExample2">
+            <div class="card card-body">
+                <b>Consider Eating:</b>
+                <ul>
+
+                 <li> Fresh fruits and vegetables</li>
+                 <li> Breads, pasta, rice</li>
+                 <li>Rice milk (not enriched)</li>
+                 <li>Corn and rice cereals</li>
+                 <li>Light-colored sodas/pop, such as lemon-lime or homemade iced tea</li>
+                </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+</div>
 {% endif %}
 
 <div>
@@ -458,19 +581,39 @@
     </div>
 {% endif %}
 
+<br>
+<div class = "row mt-3 pt-3 float-left" style='text-align: center;'>
+    <div class = "col mb-3">
+            <a href="{% url 'editpage' %}" class="card-link">
+                <button type="button" class="btn btn-success btn-lg"> Edit Past Entries</button>
+            </a>
+    </div>
+</div>
 <br><br><br>
 
-
-
+</div>
+<br><br><br>
 <!-- LINE GRAPH  -->
-
+<div class="container-sm">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
 <div>
-{% if logsFound %}
+{% if line_graph_logs_found %}
 <h1>Explore trends in nutrients for {{curr_user.first_name}} {{curr_user.last_name}}</h1>
-<h5> for {{timeRange}} days, beginning on {{curr_date}}</h5>
+<h5> Displaying entries found for <em>{{nutrientType}}<em. Start date: {{curr_date}} Time range: {{timeRange}} days </h5>
 {%else %}
-<h3> I should be an alert probably, but anyways'all didn't find any logs for this date range </h3>
+<h1>Explore trends in nutrients for {{curr_user.first_name}} {{curr_user.last_name}}</h1>
+<div class="alert alert-warning d-flex align-items-center" role="alert">
+    <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Warning:"><use xlink:href="#exclamation-triangle-fill"/></svg>
+    <div style="display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 30px;
+    width: 100%;
+    virtical-align: middle;
+    font-size: 20px">
+        <h5>&nbsp No entries found for '{{nutrientType}}'. Start date: {{curr_date}}. Time range: {{timeRange}} days </h5>
+    </div>
+  </div>
 {%endif%}
 <div class="row">
 <label for="microType" class='col'>Choose a nutrient:</label>
@@ -548,6 +691,8 @@
         });
     </script>
 </div>
-<br><br><br><br><br>
+</div>
+<br><br><br><br><br><br><br><br>
+
 {% endblock %}
 

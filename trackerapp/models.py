@@ -1,5 +1,7 @@
 from django.db import models
 from django.utils import timezone
+from django.contrib.auth import get_user_model
+loggedIn=get_user_model()
 
 class Person(models.Model):
     first_name = models.CharField(max_length=30)

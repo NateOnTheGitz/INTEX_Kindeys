@@ -8,7 +8,7 @@ from .models import Food_Log
 from .models import Food_Ingredient
 from .models import Person
 from crispy_forms.layout import Hidden
-from django.forms import ModelForm, HiddenInput
+from django.forms import ModelForm, HiddenInput, ValidationError
 
 
 class DateInput(forms.DateInput):
@@ -20,7 +20,8 @@ class Food_Log_Form(forms.ModelForm):
     #    self.fields['date'].widget.attrs.update({'type': 'datetime-local'})
     class Meta:
         model = Food_Log
-        fields = ['username', 'date', 'meal_type', 'food_name', 'quantity', 'measurement']
+        fields = '__all__'
+        exclude = ['username']
         widgets = {
             'date': DateInput()
         }
@@ -33,17 +34,19 @@ class Add_Food(forms.ModelForm) :
 
 class Person_info(forms.ModelForm) :
     userdata = User.objects.all()
-    
-    Hidden('username', 'defaulUserName')
+    # curr_username = User.username 
+    # Hidden('username', curr_username)
     # def __init__(self, *args, **kwargs):
     #     super(Person_info, self).__init__(*args, **kwargs)
         # self.fields['username'].widget = HiddenInput()
         # self.fields['password'].widget = HiddenInput()
     class Meta:
         model = Person
-        fields=['first_name', 'last_name', 'email', 'gender', 'stage', 'comorbidity', 'date_of_birth', 'weight_lbs', 'height_in', 'password']
+        # fields=['first_name', 'last_name', 'email', 'gender', 'stage', 'comorbidity', 'date_of_birth', 'weight_lbs', 'height_in', 'username','password']
+        fields = '__all__'
+        exclude = ['username']
         widgets = {
-            'date_of_birth': DateInput()
+            'date_of_birth': DateInput(),
         }
 
 class NewUserForm(UserCreationForm):

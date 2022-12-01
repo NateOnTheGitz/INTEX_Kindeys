@@ -2,12 +2,10 @@ from django.shortcuts import render, redirect
 from .forms import Food_Log_Form, Add_Food, NewUserForm, Person_info
 from .models import Food_Log, Recommended_Levels, Food_Ingredient, Person, Food_Ingredient, Measurement
 from datetime import datetime, timedelta
-from django.contrib.auth import login, authenticate, logout, get_user_model
+from django.contrib.auth import login, authenticate, logout
 from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
 
-
-loggedIn=get_user_model()
 
 # Create your views here.
 def indexPageView(request):
@@ -31,19 +29,22 @@ def createAccountPageView(request):
     form = NewUserForm()
     return render (request=request, template_name="create_account.html", context={"register_form":form})
 
-def personinfoPageView(request):
-    # form = Person_info()
+
+def personinfoPageView(request): # Note function names should ideally be in snake_case
+
+    form = Person_info()
     if request.method == 'POST':
-        form = Person_info(request.POST)
+        form = Person_info(request.POST, request.FILES)        
         if form.is_valid():
+            form.instance.username = request.user.username # Assuming you use login_required decorator so request.user would be a user instance (instead of anonymous user instance) if this line runs
             form.save()
-            return redirect('dashboard-index') 
-    else:
-        form = Person_info()
-    context = {
-        'form': form,
-    }
+            messages.success(request, "Personal Information Added Successfully")
+            return redirect('dashboard-index')
+
+    context = {"form":form}
+
     return render(request, 'person_info.html', context)
+
 
 def login_request(request):
 	if request.method == "POST":
@@ -63,24 +64,42 @@ def login_request(request):
 	form = AuthenticationForm()
 	return render(request=request, template_name="login.html", context={"login_form":form})
 
-
-def foodEntryPageView(request) :
-    data = Food_Log.objects.all()
+def foodEntryPageView(request): 
+    form = Food_Log_Form()
+    curr_username = request.user.username
+    person = Person.objects.filter(username=curr_username).all()
+    test = person
+    # data = Food_Log.objects.all()
     if request.method == 'POST':
-        form = Food_Log_Form(request.POST)
+        form = Food_Log_Form(request.POST, request.FILES)        
         if form.is_valid():
+            form.instance.username = person[0] # Assuming you use login_required decorator so request.user would be a user instance (instead of anonymous user instance) if this line runs
             form.save()
-            return redirect('food_entry')  # 'foodentry/'
-    else:
-        form = Food_Log_Form()
-    users = Person.objects.all()    
+            messages.success(request, "Food Logged Successfully")
+            return redirect('food_entry')
+
+    context = {"form":form,
+    "test": test,}
+
+    return render(request, 'food_entry.html', context)
+
+# def foodEntryPageView(request) :
+#     data = Food_Log.objects.all()
+#     if request.method == 'POST':
+#         form = Food_Log_Form(request.POST)
+#         if form.is_valid():
+#             form.save()
+#             return redirect('food_entry')  # 'foodentry/'
+#     else:
+#         form = Food_Log_Form()
+#     users = Person.objects.all()    
     
-    context = {
-        'data': data,
-        'form': form,
-        'users': users,
-    }
-    return render(request, 'food_entry.html', context) 
+#     context = {
+#         'data': data,
+#         'form': form,
+#         'users': users,
+#     }
+#     return render(request, 'food_entry.html', context) 
 
 def addfoodEntryPageView(request) :
     data = Food_Ingredient.objects.all()
@@ -88,6 +107,7 @@ def addfoodEntryPageView(request) :
         form = Add_Food(request.POST)
         if form.is_valid():
             form.save()
+            messages.success(request, "Food Added Successfully")
             return redirect('add_food')  # 'foodentry/'
     else:
         form = Add_Food()
@@ -101,19 +121,19 @@ def addfoodEntryPageView(request) :
     return render(request, 'add_food.html', context) 
 
 def reportsPageView(request) :
-    test = request.user.username
-    curr_username = "TheRealMG"
-    nutrientType = "protien"
-    timeRange = 7
-    curr_date = datetime.today().date()
+    curr_username = request.user.username 
+    if curr_username == "admin":
+        curr_username = "TheRealMG"
+
     if request.method == 'POST':
         nutrientType = request.POST["nutrientSelect"]
         curr_date = datetime.strptime(request.POST["startDate"],'%Y-%m-%d').date()
         timeRange = int(request.POST["dateRange"])
     else: 
-        nutrientType = ""
+        nutrientType = "protien"
         timeRange = 7
         curr_date = datetime.today().date()
+
 
     # DATA FOR BAR GRAPH 
     curr_user_object = Person.objects.filter(username=curr_username).values() 
@@ -138,7 +158,7 @@ def reportsPageView(request) :
     else: 
         #SHOULD BE ERROR
         userFound = False
-        curr_user = 0 
+        return redirect('person_info')
 
     logs_by_day = Food_Log.objects.filter(date=curr_date_for_bar).filter(username__username=curr_username).values()
     sodiumByDay = 0
@@ -177,8 +197,16 @@ def reportsPageView(request) :
         logsFound = True
     else: 
         #SHOULD BE ERROR
-        actualByDay = 0
-        logsFound = False
+        actualByDay = {
+        "sodium": 0,
+        "potassium": 0,
+        "water": 0,
+        "phos": 0,
+        "protien": 0,
+        }
+        logsFound = False    
+        
+    
 
      # DATA FOR BAR GRAPH LIMITS    
     recMicroNutrients = Recommended_Levels.objects.values()
@@ -193,37 +221,38 @@ def reportsPageView(request) :
         "water_m": row["rec_water_L_male"],
         "water_f": row["rec_water_L_female"],
         "protien_limit": row["rec_protein_g_by_kg"] * curr_user['weight_lbs'],
-        "test": test,
         }
 
     #BAR GRAPH CHECK DATA EXCEEDS LIMITS
     #Water
+    waterAlert = False
     if curr_user["gender"] == "M" or "m" or "Male" or "male":
-        if actualByDay['water'] > 3.7 :
+        if actualByDay['water'] > recByMicro['water_m'] :
             waterAlert = True
+        else: 
+            waterAlert = False
     else :
-        if actualByDay['water'] > 2.7 :
+        if actualByDay['water'] > recByMicro['water_f'] :
             waterAlert = True
-
+        else: 
+            waterAlert = False
     if actualByDay['sodium'] > recByMicro['sodium_max'] :
         sodiumAlert = True
     else :
         sodiumAlert = False
-
     if actualByDay['potassium'] > recByMicro['potassium_max'] :
         potassiumAlert = True
     else :
         potassiumAlert = False
-
     if actualByDay['phos'] > recByMicro['phos_max'] :
         phosAlert = True
     else :
         phosAlert = False
-
     if actualByDay['protien'] > recByMicro['protien_limit'] :
         protienAlert = True
     else :
         protienAlert = False
+        
     # DATA FOR LINE GRAPH
     datesWeek = [] # gets the dates for the last week
     for i in range(0, timeRange):
@@ -252,6 +281,11 @@ def reportsPageView(request) :
             nutrientConsumed += nutrient
         sliceNutrient.append(nutrientConsumed)
 
+    line_graph_logs_found = False
+    for day in sliceNutrient:
+        if day != 0:
+            line_graph_logs_found = True
+
     # CONTEXT DICTIONARY 
     context = {
         "recByMicro": recByMicro,
@@ -269,16 +303,18 @@ def reportsPageView(request) :
         'potassiumAlert' : potassiumAlert,
         'phosAlert' : phosAlert,
         'protienAlert' : protienAlert,
-
-        # 'test': test,
+        'curr_date_for_bar': curr_date_for_bar,
+        'line_graph_logs_found' : line_graph_logs_found
     }
     return render(request, 'reports.html', context) 
 
 
 def editPageView(request) :
-    data = Food_Log.objects.all()
+    # data = Food_Log.objects.all()
+    curr_username = request.user.username 
+    logs_by_day = Food_Log.objects.filter(username__username=curr_username)
     context = {
-        'data': data,
+        'data': logs_by_day,
     }
     return render(request, 'edit.html', context) 
 
@@ -295,15 +331,18 @@ def edit(request, id):
     if request.method == 'POST':
         new_date = request.POST['date']
         new_meal_type = request.POST['meal_type']
-        new_food_name = request.POST['food_name']
+        new_food_query = Food_Ingredient.objects.filter(food_name = request.POST['food_name'])
+        new_food_name = new_food_query[0]
         new_quantity = request.POST['quantity']
-        new_measurement = request.POST['measurement']
+        new_measurement_query = Measurement.objects.filter(measurement_desc = request.POST['measurement'])
+        new_measurement = new_measurement_query[0]
         mylog.date = new_date
         mylog.meal_type = new_meal_type
-        mylog.food_name = Food_Ingredient.objects.get(id = id)
+        mylog.food_name = new_food_name # Food_Ingredient.objects.get(id = id)
         mylog.quantity = new_quantity
-        mylog.measurement = Measurement.objects.get(id = id)
+        mylog.measurement = new_measurement # Measurement.objects.get(id = id)
         mylog.save()
+        return redirect('editpage')
     context={
         'record': mylog,
         'foods': foods,

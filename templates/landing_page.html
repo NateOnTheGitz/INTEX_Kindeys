@@ -3,6 +3,9 @@
 {% block title %} Homepage {% endblock %}
  
 {% block content %}
+
+{% if user.is_authenticated %}
+{% include 'partials/messages.html' %}
 <br><br>
 <h1 style='text-align: center;'>Customize your own experience!</h1>
 <br><br>
@@ -146,5 +149,150 @@
 
 </div>
 <br><br><br>
+{% else %}
+{% include 'partials/messages.html' %}
+<br><br>
+<h1 style='text-align: center;'>Customize your own experience!</h1>
+<br><br>
+<!-- journal and report links -->
+<div class = "row mt-3 pt-3" style='text-align: center;'>
+    <!--chart will go here later-->
+    <div class = "col" >
+        <div class="card border-info mb-3" style='border-width: medium;'>
+            <a href="{% url 'login' %}" class="card-link">
+                <div class="card-body">
+                    <h2 class="card-title" style='color:teal'>Make a Journal Entry</h2>
+                    <h6 class="card-subtitle mb-2 text-muted">Record your own meals.</h6>
+                </div>
+            </a>
+        </div>
+    </div>
 
+    <div class = "col" >
+        <div class="card border-info mb-3" style='border-width: medium;'>
+            <a href="{% url 'login' %}" class="card-link" >
+                <div class="card-body">
+                    <h2 class="card-title" style='color:teal'>View Your Report</h2>
+                    <h6 class="card-subtitle mb-2 text-muted">View your past entries and trends. </h6>
+                </div>
+            </a>
+        </div>
+    </div>
+    
+</div>
+<br><br>
+<hr style='color:black; border-width: 6px;'>
+<!--learn about micronutrient header-->
+<div class="jumbotron jumbotron-fluid">
+    <div class="container">
+      <h1 class="display-4">Managing Nutrients</h1>
+      <p class="lead">Click on the nutrient below to learn more about what it is, how it effects you, how to manage the foods you eat, and some general hints and tips!</p>
+    </div>
+  </div>
+  
+  <!-- second row -->
+<div class = "row mt-3 pt-3" style='text-align: center;'>
+    <div class = "col">
+        <div class="card text-white bg-info mb-3"style="width: 14rem;">
+            <a href="https://www.kidney.org/atoz/content/getting-more-protien-while-dialysis" target="_blank" class="card-link">
+                <div class="card-body">
+                    <h5 class="card-title" style='color:white;'>Protien</h5>
+                </div>
+            </a>
+        </div>
+    </div>
+    
+    <div class = "col" >
+        <div class="card text-white bg-info mb-3" style="width: 14rem;">
+            <a href="https://www.kidney.org/atoz/content/phosphorus" target="_blank" class="card-link">
+                <div class="card-body">
+                    <h5 class="card-title" style='color:white;'>Phosphorus</h5>                    
+                    <!--<a href="#" class="card-link">Card link</a>-->
+                    <!--<a href="#" class="card-link">Another link</a>-->
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <div class = "col">
+        <div class="card text-white bg-info mb-3" style="width: 14rem;">
+            <a href="https://www.kidney.org/atoz/content/sodiumckd" target="_blank" class="card-link">
+                <div class="card-body">
+                    <h5 class="card-title" style='color:white;'>Sodium</h5>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <div class = "col">
+        <div class="card text-white bg-info mb-3" style="width: 14rem;">
+            <a href="https://www.kidney.org/atoz/content/potassium" target="_blank" class="card-link">
+                <div class="card-body">
+                    <h5 class="card-title" style='color:white;'>Potassium</h5>
+                </div>
+            </a>
+        </div>
+    </div>
+    <hr style='color:black; border-width: 6px;' width="10000px">
+
+    <br><br><br><br><br><br><br><br><br>
+    
+    <div row style='margin-left: auto;
+    margin-right: auto;
+    width: 40%;'>
+        <div class = "col">
+        </div>
+        <h1></h1>
+        <div id="carouselExampleInterval" class="carousel slide" data-ride="carousel">
+            <div class="carousel-inner">
+
+              <div class="carousel-item active" data-interval="10000">
+                <a href="https://www.davita.com/diet-nutrition/recipes" target="_blank">
+                <img src="https://images.pexels.com/photos/5907629/pexels-photo-5907629.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" class="d-block h-50" style="width:640px;height:360px">
+                <div class="carousel-caption d-none d-md-block">
+                    <h5 style='color:black; background-color: white'><b>Find kidney friendly recipes! </b></h5>
+                    <p style='color:black; background-color: white'><b>There's plenty to eat that'll make both you and your kidneys happy</b></p>
+              </div>
+              </a>
+              </div>
+
+              <div class="carousel-item" data-interval="10000">
+                <a href="https://www.davita.com/diet-nutrition/eating-out-guides" target="_blank">
+                    <img src="https://images.unsplash.com/photo-1600891964599-f61ba0e24092?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=870&q=80" class="d-block w-60" style="width:600px;height:380px">
+                    <div class="carousel-caption d-none d-md-block">
+                        <h5 style='color:black; background-color: white'><b>A guide to eating out</b></h5>
+                        <p style='color:black; background-color: white'><b>If you do it the right way, eating out can still be a part of your life </b></p>
+                  </div>
+                  </a>
+                  </div>
+
+              <div class="carousel-item" data-interval="10000">
+                    <a href="https://forums.davita.com/" target="_blank">
+                        <img src="https://www.westonschools.org/middle/wp-content/uploads/sites/5/2019/12/30-303671_free-community-service-cliparts-download-free-clip-community-1.png" class="d-block w-60" style="width:450px;height:360px">
+                        <div class="carousel-caption d-none d-md-block">
+                            <h5 style='color:black; background-color: white'><b>Find your community</b></h5>
+                            <p style='color:black; background-color: white'><b>You're not alone in this journey </b></p>
+                      </div>
+                      </a>
+                      </div>
+
+
+            </div>
+
+            <button class="carousel-control-prev" type="button" data-target="#carouselExampleInterval" data-slide="prev">
+              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+              <span class="sr-only">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-target="#carouselExampleInterval" data-slide="next">
+              <span class="carousel-control-next-icon" aria-hidden="true"></span>
+              <span class="sr-only">Next</span>
+            </button>
+          </div>
+        </div> 
+
+
+
+</div>
+<br><br><br>
+{% endif %}
 {% endblock %}

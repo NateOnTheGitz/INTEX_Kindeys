@@ -25,7 +25,7 @@
         <select class="form-control" name="food_name" id="food_name" required>
             <option hidden disabled selected value>--Select an option--</option>
         {% for food in foods %}
-            <option value="{{ food.id }}">{{ food }}</option>
+            <option value="{{ food }}">{{ food }}</option>
         {% endfor %} 
         </select>
         <br>
@@ -36,7 +36,7 @@
         <select class="form-control" name="measurement" id="measurement" required>
             <option hidden disabled selected value>--Select an option--</option>
             {% for measure in measures %}
-                <option value="{{ measure.id }}">{{ measure }}</option>
+                <option value="{{ measure }}">{{ measure }}</option>
             {% endfor %} 
             </select>        <br>
         <input class = 'btn btn-success btn-block' type='submit' value = 'Log Food'>
