@@ -4,7 +4,19 @@
  
 {% block content %}
 
-<form action="action_page.php" method="post" style='border: 3px solid #f1f1f1;'>
+{% load crispy_forms_tags %}
+
+<div class="container py-5">
+  <h1>Login</h1>
+  <form method="POST">
+    {% csrf_token %}
+    {{ login_form |crispy }}
+    <button class="btn btn-primary" type="submit">Login</button>
+  </form>
+  <p class="text-center">Don't have an account? <a href="{% url 'create_account' %}">Create an account</a>.</p>
+</div>
+
+{% comment %} <form action="action_page.php" method="post" style='border: 3px solid #f1f1f1;'>
     <div class="imgcontainer" style='text-align: center;
     margin: 24px 0 12px 0;'>
       <img src="https://media.istockphoto.com/id/1300845620/vector/user-icon-flat-isolated-on-white-background-user-symbol-vector-illustration.jpg?s=612x612&w=0&k=20&c=yBeyba0hUkh14_jgv1OKqIH0CCSWU_4ckRkAoy2p73o=" alt="Avatar" class="avatar" style='width: 20%;border-radius: 50%;'>
@@ -53,6 +65,6 @@
       Create an Acount</button>
       
     </div>
-  </form>
+  </form> {% endcomment %}
 
   {% endblock %}

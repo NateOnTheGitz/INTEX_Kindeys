@@ -19,7 +19,7 @@
 <script src="path/to/chartjs-plugin-annotation/dist/chartjs-plugin-annotation.min.js"></script> {% endcomment %}
 <br><br><br>
 <h1>View daily totals</h1>
-
+<h3> {{test}} </h3>
 <br>
 <a href="{% url 'editpage' %}">Edit Entries</a>
 <br>
@@ -113,7 +113,7 @@
         height: 30px;
         width: 100%;
         virtical-align: middle">
-            <p>&nbsp &nbsp You have exceeded your reccomended water levels for the day!</p>
+            <p>&nbsp &nbsp You have exceeded your recommended water levels for the day!</p>
         </div>
     </div>
 {% endif %}
@@ -204,7 +204,7 @@
 <div class="alert alert-warning d-flex align-items-center" role="alert">
     <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Warning:"><use xlink:href="#exclamation-triangle-fill"/></svg>
     <div>
-        <p>&nbsp &nbsp You have exceeded your reccomended sodiumn levels for the day!</p>
+        <p>&nbsp &nbsp You have exceeded your recommended sodiumn levels for the day!</p>
     </div>
 </div>
 {% endif %}
@@ -295,7 +295,7 @@
     <div class="alert alert-warning d-flex align-items-center" role="alert">
         <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Warning:"><use xlink:href="#exclamation-triangle-fill"/></svg>
         <div>
-            <p>&nbsp &nbsp You have exceeded your reccomended potassium levels for the day!</p>
+            <p>&nbsp &nbsp You have exceeded your recommended potassium levels for the day!</p>
         </div>
     </div>
 {% endif %}
@@ -385,7 +385,7 @@
     <div class="alert alert-warning d-flex align-items-center" role="alert">
         <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Warning:"><use xlink:href="#exclamation-triangle-fill"/></svg>
         <div>
-            <p>&nbsp &nbsp You have exceeded your reccomended phosphorus levels for the day!</p>
+            <p>&nbsp &nbsp You have exceeded your recommended phosphorus levels for the day!</p>
         </div>
     </div>
 {% endif %}
@@ -403,9 +403,9 @@
     const myChartprotien = new Chart(ctxprotien, {
         type: 'bar',
         data: {
-            labels: ['Protien'],
+            labels: ['Protein'],
             datasets: [{
-                label: 'Amount Of Protien(g)',
+                label: 'Amount Of Protein(g)',
                 data: [{{actualByDay.protien}}],
                 backgroundColor: [
                     '#fab669'
@@ -431,7 +431,7 @@
                         limitLabel1: {
                             type: 'label',
                             xValue: protienLimit1,
-                            content: ['protienGoal'],
+                            content: ['Protein Goal'],
                         },
                     }
                 }
@@ -453,7 +453,7 @@
     <div class="alert alert-warning d-flex align-items-center" role="alert">
         <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Warning:"><use xlink:href="#exclamation-triangle-fill"/></svg>
         <div>
-            <p>&nbsp &nbsp You have exceeded your reccomended protien levels for the day!</p>
+            <p>&nbsp &nbsp You have exceeded your recommended protien levels for the day!</p>
         </div>
     </div>
 {% endif %}
@@ -468,7 +468,7 @@
 <div>
 {% if logsFound %}
 <h1>Explore trends in nutrients for {{curr_user.first_name}} {{curr_user.last_name}}</h1>
-<h5> for the last {{timeRange}} days, beginning on {{curr_date}}</h5>
+<h5> for {{timeRange}} days, beginning on {{curr_date}}</h5>
 {%else %}
 <h3> I should be an alert probably, but anyways'all didn't find any logs for this date range </h3>
 {%endif%}
@@ -483,7 +483,7 @@
         <div class="col">
     <select name="nutrientSelect" id="nutrientSelect" form="microType" class="form-control" value="protien" required>
         <option hidden disabled selected value>--Select an option--</option>
-        <option value="protien">Protien</option>
+        <option value="protien">Protein</option>
         <option value="phosphorus">Phosphorus</option>
         <option value="water">Water</option>
         <option value="potassium">Potassium</option>
@@ -548,5 +548,6 @@
         });
     </script>
 </div>
+<br><br><br><br><br>
 {% endblock %}
 

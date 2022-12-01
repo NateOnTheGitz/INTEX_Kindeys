@@ -1,10 +1,14 @@
 # from django import forms
 # from .models import 
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
 from django import forms
 from django.forms import ModelForm
 from .models import Food_Log
 from .models import Food_Ingredient
-from .models import User
+from .models import Person
+from crispy_forms.layout import Hidden
+from django.forms import ModelForm, HiddenInput
 
 
 class DateInput(forms.DateInput):
@@ -27,11 +31,30 @@ class Add_Food(forms.ModelForm) :
         model = Food_Ingredient
         fields = '__all__'
 
-class Create_User(forms.ModelForm) :
+class Person_info(forms.ModelForm) :
+    userdata = User.objects.all()
+    
+    Hidden('username', 'defaulUserName')
+    # def __init__(self, *args, **kwargs):
+    #     super(Person_info, self).__init__(*args, **kwargs)
+        # self.fields['username'].widget = HiddenInput()
+        # self.fields['password'].widget = HiddenInput()
     class Meta:
-        model = User
-        fields=['first_name', 'last_name', 'email', 'gender', 'stage', 'comorbidity', 'date_of_birth', 'weight_lbs', 'height_in', 'username', 'password']
+        model = Person
+        fields=['first_name', 'last_name', 'email', 'gender', 'stage', 'comorbidity', 'date_of_birth', 'weight_lbs', 'height_in', 'password']
         widgets = {
             'date_of_birth': DateInput()
         }
 
+class NewUserForm(UserCreationForm):
+	email = forms.EmailField(required=True)
+	class Meta:
+		model = User
+		fields = ("username", "email", "password1", "password2")
+
+	def save(self, commit=True):
+		user = super(NewUserForm, self).save(commit=False)
+		user.email = self.cleaned_data['email']
+		if commit:
+			user.save()
+		return user

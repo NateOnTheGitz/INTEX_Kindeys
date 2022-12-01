@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils import timezone
 
-class User(models.Model):
+class Person(models.Model):
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
     gender = models.CharField(max_length=1)
@@ -76,7 +76,7 @@ class Recommended_Levels(models.Model):
 
 class Food_Log(models.Model):
     date = models.DateField(default=timezone.now)
-    username = models.ForeignKey(User, on_delete=models.DO_NOTHING, default=0)
+    username = models.ForeignKey(Person, on_delete=models.DO_NOTHING, default=0)
     meal_type = models.CharField(max_length=50)
     food_name = models.ForeignKey(Food_Ingredient, on_delete=models.DO_NOTHING)
     quantity = models.DecimalField(default=0, decimal_places=3, max_digits=10)

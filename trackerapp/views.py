@@ -1,36 +1,67 @@
 from django.shortcuts import render, redirect
-from .forms import Food_Log_Form, Add_Food, Create_User
-from .models import Food_Log, Recommended_Levels, Food_Ingredient, User, Food_Ingredient, Measurement
+from .forms import Food_Log_Form, Add_Food, NewUserForm, Person_info
+from .models import Food_Log, Recommended_Levels, Food_Ingredient, Person, Food_Ingredient, Measurement
 from datetime import datetime, timedelta
+from django.contrib.auth import login, authenticate, logout, get_user_model
+from django.contrib import messages
+from django.contrib.auth.forms import AuthenticationForm
+
+
+loggedIn=get_user_model()
 
 # Create your views here.
 def indexPageView(request):
     context = {
- 
+        
     }
+
     return render(request, 'landing_page.html', context)
 
 
-def createAccountPageView(request) :
-    data = User.objects.all()
+def createAccountPageView(request):
+    if request.method == "POST":
+        form = NewUserForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            messages.success(request, "Registration successful." )
+            return redirect('person_info')
+        else:
+            messages.error(request, "Unsuccessful registration. Invalid information.")
+    form = NewUserForm()
+    return render (request=request, template_name="create_account.html", context={"register_form":form})
+
+def personinfoPageView(request):
+    # form = Person_info()
     if request.method == 'POST':
-        form = Create_User(request.POST)
+        form = Person_info(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('/')
+            return redirect('dashboard-index') 
     else:
-        form = Create_User()
+        form = Person_info()
     context = {
-        'data': data,
         'form': form,
     }
-    return render(request, 'create_account.html', context) 
+    return render(request, 'person_info.html', context)
 
-def loginPageView(request):
-    context = {
-
-    }
-    return render(request, 'login.html', context)
+def login_request(request):
+	if request.method == "POST":
+		form = AuthenticationForm(request, data=request.POST)
+		if form.is_valid():
+			username = form.cleaned_data.get('username')
+			password = form.cleaned_data.get('password')
+			user = authenticate(username=username, password=password)
+			if user is not None:
+				login(request, user)
+				messages.info(request, f"You are now logged in as {username}.")
+				return redirect("dashboard-index")
+			else:
+				messages.error(request,"Invalid username or password.")
+		else:
+			messages.error(request,"Invalid username or password.")
+	form = AuthenticationForm()
+	return render(request=request, template_name="login.html", context={"login_form":form})
 
 
 def foodEntryPageView(request) :
@@ -42,7 +73,7 @@ def foodEntryPageView(request) :
             return redirect('food_entry')  # 'foodentry/'
     else:
         form = Food_Log_Form()
-    users = User.objects.all()    
+    users = Person.objects.all()    
     
     context = {
         'data': data,
@@ -60,7 +91,7 @@ def addfoodEntryPageView(request) :
             return redirect('add_food')  # 'foodentry/'
     else:
         form = Add_Food()
-    users = User.objects.all()    
+    users = Person.objects.all()    
     
     context = {
         'data': data,
@@ -70,6 +101,7 @@ def addfoodEntryPageView(request) :
     return render(request, 'add_food.html', context) 
 
 def reportsPageView(request) :
+    test = request.user.username
     curr_username = "TheRealMG"
     nutrientType = "protien"
     timeRange = 7
@@ -84,7 +116,7 @@ def reportsPageView(request) :
         curr_date = datetime.today().date()
 
     # DATA FOR BAR GRAPH 
-    curr_user_object = User.objects.filter(username=curr_username).values() 
+    curr_user_object = Person.objects.filter(username=curr_username).values() 
     curr_date_for_bar = datetime.today().date()
 
     if len(curr_user_object) > 0:
@@ -161,6 +193,7 @@ def reportsPageView(request) :
         "water_m": row["rec_water_L_male"],
         "water_f": row["rec_water_L_female"],
         "protien_limit": row["rec_protein_g_by_kg"] * curr_user['weight_lbs'],
+        "test": test,
         }
 
     #BAR GRAPH CHECK DATA EXCEEDS LIMITS
@@ -279,10 +312,15 @@ def edit(request, id):
     return render(request, 'update.html', context)
 
 def selectPageView(request) :
-    users = User.objects.all()
+    users = Person.objects.all()
     if request.method == 'POST':
         return redirect('reports')  
     context = {
         'users': users
     }
     return render(request, 'select_landing.html', context) 
+
+def logout_request(request):
+    logout(request)
+    messages.info(request, "You have successfully logged out.") 
+    return redirect("dashboard-index")
