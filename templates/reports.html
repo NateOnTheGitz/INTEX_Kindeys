@@ -16,12 +16,10 @@
     </symbol>
 </svg>
 
-{% comment %} <script src="path/to/chartjs/dist/chart.min.js"></script>
-<script src="path/to/chartjs-plugin-annotation/dist/chartjs-plugin-annotation.min.js"></script> {% endcomment %}
+<script src="path/to/chartjs/dist/chart.min.js"></script>
+<script src="path/to/chartjs-plugin-annotation/dist/chartjs-plugin-annotation.min.js"></script>
 <br><br><br>
 <h3>View daily totals for {{curr_date_for_bar}}</h3>
-{% comment %} <h1> {% for user in test%} '{{user}}' {%endfor%} {% endcomment %}
-{% comment %} <h3> {{test}} </h3> {% endcomment %}
 <br>
 <br>
 {% block userselect %}
@@ -42,7 +40,6 @@
     </div>
   </div>
 {% endif %}
-
 <div class="container-sm">
 <div>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.0.1/dist/chart.umd.min.js"></script>
@@ -51,16 +48,8 @@
     <script src="path/to/chartjs/dist/chart.min.js"></script>
     <script src="path/to/chartjs-plugin-annotation/dist/chartjs-plugin-annotation.min.js"></script>
     <script>
-        var water = 0
-        var person = "{{curr_user.gender}}"
-        if (person === "M" ||"m" || "Male" || "male") {
-            person = "M"
-            water = 3.7
-        } else {
-            person = "F"
-            water = 2.7
-        }
-        
+   
+        var water = {{waterGender}}
         var limitWater = 0
 
         if ({{actualByDay.water}} > water){
@@ -95,15 +84,15 @@
                     annotations: {
                         limitLine1: {
                             type: 'line',
-                            xMin: water,
-                            xMax: water,
+                            xMin: {{waterGender}},
+                            xMax: {{waterGender}},
                             backgroundColor: 'black',
                             borderWidth: 5,
                         },
                         limitLabel1: {
                             type: 'label',
-                            xValue: water,
-                            content: ['Water Minimum']
+                            xValue: {{waterGender}},
+                            content: ['Water Goal']
                         },
                     }
                 }
@@ -174,26 +163,26 @@
                     annotations: {
                         limitLine1: {
                             type: 'line',
-                            xMin: sodiumLimit1,
-                            xMax: sodiumLimit1,
+                            xMin: {{recByMicro.sodium_min}},
+                            xMax: {{recByMicro.sodium_min}},
                             backgroundColor: 'black',
                             borderWidth: 5,
                         },
                         limitLine2: {
                             type: 'line',
-                            xMin: sodiumLimit2,
-                            xMax: sodiumLimit2,
+                            xMin: {{recByMicro.sodium_max}},
+                            xMax: {{recByMicro.sodium_max}},
                             backgroundColor: 'black',
                             borderWidth: 5,
                         },
                         limitLabel1: {
                             type: 'label',
-                            xValue: sodiumLimit1,
+                            xValue: {{recByMicro.sodium_min}},
                             content: ['Sodium Minimum'],
                         },
                         limitLabel2: {
                             type: 'label',
-                            xValue: sodiumLimit2,
+                            xValue: {{recByMicro.sodium_max}},
                             content: ['Sodium Maximum']
                         }
                     }
@@ -216,7 +205,7 @@
 <div class="alert alert-warning d-flex align-items-center" role="alert">
     <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Warning:"><use xlink:href="#exclamation-triangle-fill"/></svg>
     <div>
-        <p>&nbsp &nbsp You have exceeded your recommended sodiumn levels for the day!</p>
+        <p>&nbsp &nbsp You have exceeded your recommended sodium levels for the day!</p>
     </div>
 </div>
 <div>
@@ -338,11 +327,11 @@
     </div>
     <div>
         <p>
-                   <button class="btn btn-info btn-sm" type="button" data-toggle="collapse" data-target=".multi-collapse" aria-expanded="false" aria-controls="multiCollapseExample1 multiCollapseExample2">Food Recommendations</button>
+                   <button class="btn btn-info btn-sm" type="button" data-toggle="collapse" data-target=".multi-collapse1" aria-expanded="false" aria-controls="multiCollapsePot1 multiCollapsePot2">Food Recommendations</button>
           </p>
           <div class="row">
             <div class="col">
-              <div class="collapse multi-collapse" id="multiCollapseExample1">
+              <div class="collapse multi-collapse1" id="multiCollapsePot1" aria-controls="multiCollapsePot1">
                 <div class="card card-body">
                     <b>Avoid:</b>
                     <ul>
@@ -359,7 +348,7 @@
               </div>
             </div>
             <div class="col">
-              <div class="collapse multi-collapse" id="multiCollapseExample2">
+              <div class="collapse multi-collapse1" id="multiCollapsePot2" aria-controls="multiCollapsePot2">
                 <div class="card card-body">
                     <b>Consider Eating:</b>
                     <ul>
@@ -376,9 +365,7 @@
               </div>
             </div>
           </div>
-        </div>
-    </div>
-    
+        </div>    
 {% endif %}
 
 <div>
@@ -466,7 +453,7 @@
 <div class="container-sm">
 <div class="align-text-bottom">
     <div class="alert alert-warning d-flex align-items-bottom h-25" role="alert">
-        <svg class="bi flex-shrink-0 me-2" width="24" height="12" role="img" aria-label="Warning:"><use xlink:href="#exclamation-triangle-fill"/></svg>
+        <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Warning:"><use xlink:href="#exclamation-triangle-fill"/></svg>
         <div>
             <p>&nbsp &nbsp You have exceeded your recommended phosphorus levels for the day!</p>
         </div>
@@ -498,7 +485,6 @@
             <div class="card card-body">
                 <b>Consider Eating:</b>
                 <ul>
-
                  <li> Fresh fruits and vegetables</li>
                  <li> Breads, pasta, rice</li>
                  <li>Rice milk (not enriched)</li>
@@ -579,6 +565,7 @@
             <p>&nbsp &nbsp You have exceeded your recommended protien levels for the day!</p>
         </div>
     </div>
+{% e
 {% endif %}
 
 <br>
@@ -599,7 +586,7 @@
 <div>
 {% if line_graph_logs_found %}
 <h1>Explore trends in nutrients for {{curr_user.first_name}} {{curr_user.last_name}}</h1>
-<h5> Displaying entries found for <em>{{nutrientType}}<em. Start date: {{curr_date}} Time range: {{timeRange}} days </h5>
+<h5> Displaying entries found for <b>{{nutrientType}}</b>. Start date: {{curr_date}} Time range: {{timeRange}} days </h5>
 {%else %}
 <h1>Explore trends in nutrients for {{curr_user.first_name}} {{curr_user.last_name}}</h1>
 <div class="alert alert-warning d-flex align-items-center" role="alert">
@@ -609,7 +596,7 @@
     align-items: center;
     height: 30px;
     width: 100%;
-    virtical-align: middle;
+i    virtical-align: middle;
     font-size: 20px">
         <h5>&nbsp No entries found for '{{nutrientType}}'. Start date: {{curr_date}}. Time range: {{timeRange}} days </h5>
     </div>
@@ -650,9 +637,11 @@
   </form>
   
 
-
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
-    <canvas id="myChart2" width="200" height="100"></canvas>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"> </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/2.1.0/chartjs-plugin-annotation.min.js" integrity="sha512-1uGDhRiDlpOPrTi54rJHu3oBLizqaadZDDft+j4fVeFih6eQBeRPJuuP3JcxIqJxIjzOmRq57XwwO4FT+/owIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <canvas id="myChart2" width="200" height="100">
+    <script src="path/to/chartjs/dist/chart.min.js"></script>
+    <script src="path/to/chartjs-plugin-annotation/dist/chartjs-plugin-annotation.min.js"></script>anvas>
     <script>
         const ctx2 = document.getElementById('myChart2').getContext('2d');
         const myChart2 = new Chart(ctx2, {
@@ -681,8 +670,85 @@
                     borderWidth: 1
                 }]
             },
-            options: {
-                scales: {
+            options: {  
+        {%if nutrientType == "sodium" or nutrientType == "potassium" or nutrientType == "phosphorus"%}             
+                plugins: {
+                    autocolors: false,
+                    annotation: {
+                        annotations: {
+                            limitLine1: {
+                                type: 'line',
+                                yMin: {{lineGraphMin}},
+                                yMax: {{lineGraphMin}},
+                                backgroundColor: 'black',
+                                borderWidth: 5,
+                            },
+                            limitLine2: {
+                                type: 'line',
+                                yMin: {{lineGraphMax}},
+                                yMax: {{lineGraphMax}},
+                                borderColor: 'rgb(255, 99, 132)',
+                                borderWidth: 5,
+                            },
+                            limitLabel1: {
+                                type: 'label',
+                                yValue: {{lineGraphMin}},
+                                content: ['Minimum'],
+                                font: {size:15}
+                            },
+                            limitLabel2: {
+                                type: 'label',
+                                yValue: {{lineGraphMax}},
+                                content: ['Maximum'],
+                                font: {size:15}
+                            }
+                        }
+                    }
+                },
+        {% elif nutrientType == "water"%}
+        plugins: {
+                    autocolors: false,
+                    annotation: {
+                        annotations: {
+                            limitLine2: {
+                                type: 'line',
+                                yMin: {{lineGraphMax}},
+                                yMax: {{lineGraphMax}},
+                                backgroundColor: 'black',
+                                borderWidth: 5,
+                            },
+                            limitLabel2: {
+                                type: 'label',
+                                yValue: {{lineGraphMax}},
+                                content: ['Goal'],
+                                font: {size:15}
+                            }
+                        }
+                    }
+                },
+            {% else %} 
+            plugins: {
+                autocolors: false,
+                annotation: {
+                    annotations: {
+                        limitLine2: {
+                            type: 'line',
+                            yMin: {{recByMicro.protien_limit}},
+                            yMax: {{recByMicro.protien_limit}},
+                            backgroundColor: 'black',
+                            borderWidth: 5,
+                        },
+                        limitLabel2: {
+                            type: 'label',
+                            yValue: {{recByMicro.protien_limit}},
+                            content: ['Goal'],
+                            font: {size:15}
+                        }
+                    }
+                }
+            },
+            {% endif %}
+                    scales: {
                     y: {
                         beginAtZero: true
                     }

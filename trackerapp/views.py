@@ -127,10 +127,12 @@ def reportsPageView(request) :
 
     if request.method == 'POST':
         nutrientType = request.POST["nutrientSelect"]
+        if nutrientType == "protien":
+            nutrientType = 'protein'
         curr_date = datetime.strptime(request.POST["startDate"],'%Y-%m-%d').date()
         timeRange = int(request.POST["dateRange"])
     else: 
-        nutrientType = "protien"
+        nutrientType = "protein"
         timeRange = 7
         curr_date = datetime.today().date()
 
@@ -226,16 +228,22 @@ def reportsPageView(request) :
     #BAR GRAPH CHECK DATA EXCEEDS LIMITS
     #Water
     waterAlert = False
-    if curr_user["gender"] == "M" or "m" or "Male" or "male":
+    waterGender = 0
+    stringList = ["M", "m", "Male", "male"]
+    if curr_user["gender"] in stringList:         
+        waterGender = recByMicro['water_m'] 
         if actualByDay['water'] > recByMicro['water_m'] :
             waterAlert = True
         else: 
             waterAlert = False
+        
     else :
+        waterGender = recByMicro['water_f']
         if actualByDay['water'] > recByMicro['water_f'] :
             waterAlert = True
         else: 
             waterAlert = False
+        
     if actualByDay['sodium'] > recByMicro['sodium_max'] :
         sodiumAlert = True
     else :
@@ -258,6 +266,8 @@ def reportsPageView(request) :
     for i in range(0, timeRange):
         datesWeek.append(curr_date + timedelta(days=i))
     
+    lineGraphMin = 100
+    lineGraphMax = 200
     sliceNutrient = []
     for counter in range(0,timeRange):
         nutrientConsumed = 0
@@ -270,12 +280,19 @@ def reportsPageView(request) :
             # can call index 0 bc this matches on a pk  and will always return just one record but it's wrapped in a slice
             if nutrientType == "sodium": 
                 nutrient = micro_values_for_log[0]["sodium_mg"] * quantity 
+                lineGraphMin = recByMicro["sodium_min"]
+                lineGraphMax = recByMicro["sodium_max"]
             elif nutrientType ==  "potassium":
                 nutrient = micro_values_for_log[0]["potassium_mg"] * quantity
+                lineGraphMin = recByMicro["potassium_min"]
+                lineGraphMax = recByMicro["potassium_max"]
             elif nutrientType == "water":
                 nutrient = micro_values_for_log[0]["water_L"] * quantity
-            elif nutrientType == "phos":
+                lineGraphMax = waterGender 
+            elif nutrientType == "phosphorus":
                 nutrient = micro_values_for_log[0]["phos_mg"] * quantity
+                lineGraphMin = recByMicro["phos_min"]
+                lineGraphMax = recByMicro["phos_max"]
             else: 
                 nutrient = micro_values_for_log[0]["protien_g"] * quantity
             nutrientConsumed += nutrient
@@ -285,6 +302,7 @@ def reportsPageView(request) :
     for day in sliceNutrient:
         if day != 0:
             line_graph_logs_found = True
+
 
     # CONTEXT DICTIONARY 
     context = {
@@ -304,7 +322,10 @@ def reportsPageView(request) :
         'phosAlert' : phosAlert,
         'protienAlert' : protienAlert,
         'curr_date_for_bar': curr_date_for_bar,
-        'line_graph_logs_found' : line_graph_logs_found
+        'line_graph_logs_found' : line_graph_logs_found,
+        "lineGraphMin": lineGraphMin,
+        "lineGraphMax": lineGraphMax,
+        'waterGender': waterGender
     }
     return render(request, 'reports.html', context) 
 
